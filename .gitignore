@@ -1,0 +1,9 @@
+# Data bliver på computeren og kommer aldrig på GitHub
+*.xlsx
+*.xls
+*.csv
+*.XLSX
+*.XLS
+*.CSV
+data.js
+.DS_Store

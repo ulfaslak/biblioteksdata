@@ -1,0 +1,1340 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biblioteksprognose</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --card: #ffffff;
+  --soft: #f2f6fa;
+  --ink: #1b2a40;
+  --muted: #5b6a80;
+  --line: #d3dce6;
+  --bar: #9fb3c8;
+  --accent: #2b7fb4;
+  --accent-soft: #dcebf5;
+  --warm: #b8602e;
+  --warm-soft: #f7e6da;
+  --shadow: none;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.5 -apple-system, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding: 32px 24px 64px; }
+header.top { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+h1 { font-size: 28px; line-height: 1.15; margin: 0 0 4px; }
+.sub { color: var(--muted); margin-top: 4px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+label.ctl { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); gap: 4px; }
+select, input[type=date], input[type=text], input[type=number] {
+  font: inherit; color: var(--ink); background: var(--card); border: 1px solid var(--line);
+  border-radius: 0; padding: 7px 10px; min-height: 38px;
+}
+button {
+  font: inherit; cursor: pointer; border-radius: 0; padding: 7px 14px; min-height: 38px;
+  border: 1px solid var(--accent); background: var(--accent); color: #fff; font-weight: 600;
+}
+button.ghost { background: transparent; color: var(--accent); }
+button.small { min-height: 30px; padding: 3px 10px; font-size: 14px; }
+.card { background: none; border: 0; border-top: 1px solid var(--line); padding: 14px 0 0; margin-bottom: 32px; }
+.card h2 { font-size: 16px; margin: 0 0 4px; }
+.card .lead { color: var(--muted); margin: 0 0 14px; font-size: 15px; }
+.hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; border-top: 0; padding-top: 0; }
+.hero > div:first-child { background: var(--soft); padding: 18px 20px; }
+.hero .big { font-size: 15px; color: var(--muted); }
+.hero .num { font-size: 52px; font-weight: 700; line-height: 1.05; letter-spacing: -.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.hero .range { color: var(--muted); margin-top: 6px; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; }
+.fact { background: var(--soft); padding: 10px 14px; }
+.fact b { display: block; font-size: 15px; }
+.fact span { color: var(--muted); font-size: 14px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { fill: var(--muted); font-size: 12px; font-family: inherit; }
+svg .val { fill: var(--ink); font-weight: 600; font-size: 13px; }
+.heat { overflow-x: auto; }
+.heat table { border-collapse: separate; border-spacing: 2px; font-size: 12px; font-variant-numeric: tabular-nums; min-width: 560px; width: 100%; }
+.heat th { color: var(--muted); font-weight: 500; padding: 2px 4px; text-align: center; }
+.heat th.row { text-align: left; white-space: nowrap; padding-right: 8px; }
+.heat td { text-align: center; padding: 6px 0; border-radius: 0; color: var(--ink); }
+.brief { width: 100%; min-height: 280px; font: 14px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace; color: var(--ink); background: var(--soft); border: 1px solid var(--line); border-radius: 0; padding: 12px; resize: vertical; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.muted { color: var(--muted); }
+.note { font-size: 14px; color: var(--muted); }
+.warn { background: var(--warm-soft); border: 1px solid var(--warm); color: var(--ink); border-radius: 0; padding: 10px 14px; margin-bottom: 16px; font-size: 15px; }
+.pill { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 0; background: var(--accent-soft); color: var(--ink); }
+.pill.valg { background: var(--warm-soft); }
+ul.special { list-style: none; padding: 0; margin: 0 0 12px; }
+ul.special li { display: flex; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 15px; flex-wrap: wrap; }
+ul.special li .d { font-variant-numeric: tabular-nums; min-width: 96px; }
+ul.special li .n { flex: 1; min-width: 0; }
+ul.special li .x { margin-left: 0; }
+details { margin-top: 8px; }
+summary { cursor: pointer; font-weight: 600; }
+table.map { border-collapse: collapse; font-size: 14px; width: 100%; }
+table.map td, table.map th { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+table.map select { min-height: 30px; padding: 2px 6px; max-width: 220px; }
+footer { color: var(--muted); font-size: 14px; text-align: center; margin-top: 24px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 10px; }
+.chips button { background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 0; min-height: 32px; padding: 4px 14px; }
+.chips button[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+#viewMode { margin-left: 10px; }
+table.why td { padding: 6px 4px; font-size: 13px; }
+table.why th.row { vertical-align: middle; }
+table.why td.up { color: var(--accent); font-weight: 600; }
+table.why td.dn { color: var(--warm); font-weight: 600; }
+table.why td.z { color: var(--muted); }
+table.why td.tot { font-weight: 700; }
+table.why td small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); }
+.legend { display: flex; gap: 16px; font-size: 13px; color: var(--muted); flex-wrap: wrap; margin-top: 6px; }
+.legend i { display: inline-block; width: 14px; height: 10px; border-radius: 0; vertical-align: middle; margin-right: 5px; }
+#drop {
+  position: fixed; inset: 0; background: color-mix(in srgb, var(--bg) 92%, transparent); display: none;
+  align-items: center; justify-content: center; z-index: 10; padding: 16px;
+}
+#drop.show { display: flex; }
+#drop .box { max-width: 560px; width: 100%; text-align: center; border: 2px dashed var(--accent); border-radius: 0; padding: 40px 24px; background: var(--card); }
+#drop .box h2 { margin: 0 0 8px; }
+#busy { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: color-mix(in srgb, var(--bg) 85%, transparent); z-index: 11; }
+#busy.show { display: flex; }
+#busy .box { background: var(--card); border: 1px solid var(--line); border-radius: 0; padding: 24px 28px; box-shadow: var(--shadow); text-align: center; min-width: 280px; }
+.spinner { width: 28px; height: 28px; border: 3px solid var(--accent-soft); border-top-color: var(--accent); border-radius: 50%; margin: 0 auto 12px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.tabs { display: inline-flex; gap: 0; background: var(--card); border: 1px solid var(--line); border-radius: 0; padding: 0; margin-bottom: 16px; }
+.tabs button { background: transparent; color: var(--muted); border: 0; min-height: 34px; padding: 4px 18px; }
+.tabs button[aria-selected="true"] { background: var(--accent); color: #fff; }
+#daysChart { position: relative; }
+#daysChart .col { fill: transparent; }
+#daysChart .col:hover { fill: var(--soft); }
+#daysChart .hit { fill: transparent; cursor: default; }
+#daysChart .hit:hover { fill: color-mix(in srgb, var(--accent) 18%, transparent); }
+#daysChart .hit.bartop:hover { fill: color-mix(in srgb, var(--ink) 22%, transparent); stroke: var(--ink); stroke-width: 1.5; }
+#daysChart .tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; font-size: 13px; line-height: 1.4; padding: 7px 10px; max-width: 260px; z-index: 5; white-space: pre-line; }
+#daysChart .tip b { font-weight: 600; }
+.hidden { display: none !important; }
+@media (max-width: 760px) {
+  .hero, .grid2 { grid-template-columns: 1fr; }
+  .hero .num { font-size: 42px; }
+  h1 { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Biblioteksprognose</h1>
+      <div class="sub" id="subtitle">Hvor mange besøgende og udlån kan vi forvente i den kommende uge?</div>
+    </div>
+    <div class="controls hidden" id="controls">
+      <label class="ctl">Bibliotek
+        <select id="branch"></select>
+      </label>
+      <label class="ctl">Ugen starter
+        <input type="date" id="start">
+      </label>
+      <button class="ghost" id="addFiles" type="button">Tilføj filer</button>
+    </div>
+  </header>
+
+  <div class="tabs hidden" id="tabs" role="tablist"><button type="button" role="tab" data-m="besoeg">Besøgende</button><button type="button" role="tab" data-m="udlaan">Udlån</button></div><div class="tabs hidden" id="viewMode" role="tablist"><button type="button" role="tab" data-v="entre">Entré</button><button type="button" role="tab" data-v="bygning">I bygningen</button></div>
+
+  <div id="warnings"></div>
+
+  <section id="result" class="hidden">
+    <div class="card hero">
+      <div>
+        <div class="big" id="heroLabel"></div>
+        <div class="num" id="heroNum"></div>
+        <div class="range" id="heroRange"></div>
+      </div>
+      <div class="facts" id="facts"></div>
+    </div>
+
+    <div class="card">
+      <h2>Dag for dag</h2>
+      <p class="lead" id="dayLead"></p>
+      <div class="chips" id="dayCtl"><button type="button" data-t="why" aria-pressed="false">Vis årsag</button><button type="button" data-t="ly" aria-pressed="false">Samme uge sidste år</button></div>
+      <div id="daysChart"></div>
+      <div class="legend" id="daysLegend"></div>
+      <div id="whyTable"></div>
+    </div>
+
+    <div class="card" id="hourCard">
+      <h2>Time for time</h2>
+      <p class="lead" id="heatLead"></p>
+      <div class="heat" id="heat"></div>
+    </div>
+
+    <div class="card" id="trustCard">
+      <h2>Kan man stole på den?</h2>
+      <p class="lead" id="trustLead"></p>
+      <div id="trustChart"></div>
+      <div class="legend"><span><i style="background:var(--ink)"></i>Faktisk</span><span><i style="background:var(--accent)"></i>Prognose</span><span><i style="background:var(--accent-soft)"></i>Sandsynligt spænd</span></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>Særlige dage</h2>
+        <p class="lead">Valg, arrangementer og lukkedage. Modellen kan kun kende dem, hvis nogen fortæller den om dem.</p>
+        <ul class="special" id="specialList"></ul>
+        <div class="row">
+          <input type="date" id="spDate" aria-label="Dato">
+          <input type="text" id="spName" placeholder="Fx forfatteraften" aria-label="Navn" style="flex:1;min-width:140px">
+          <select id="spType" aria-label="Type">
+            <option value="arrangement">Arrangement</option>
+            <option value="valg">Valg</option>
+            <option value="lukket">Lukket</option>
+          </select>
+          <button class="small" id="spAdd" type="button">Tilføj</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Skoleferier</h2>
+        <p class="lead">Ugenumre. De varierer fra kommune til kommune, så ret dem til jeres egne.</p>
+        <div class="row">
+          <label class="ctl">Vinterferie, uge<input type="number" id="setWinter" min="1" max="53" style="width:90px"></label>
+          <label class="ctl">Efterårsferie, uge<input type="number" id="setAutumn" min="1" max="53" style="width:90px"></label>
+          <label class="ctl">Sommerferie, fra uge<input type="number" id="setSumFrom" min="1" max="53" style="width:90px"></label>
+          <label class="ctl">til uge<input type="number" id="setSumTo" min="1" max="53" style="width:90px"></label>
+        </div>
+        <p class="note">Helligdage, påske og jul regnes automatisk.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>Kort tekst til kolleger eller chef</summary>
+        <p class="lead" style="margin-top:8px">Kopiér og indsæt i en mail, i Teams eller tilbage i chatten med din AI-assistent.</p>
+        <textarea class="brief" id="brief" readonly></textarea>
+        <div class="row" style="margin-top:10px"><button id="copy" type="button">Kopiér teksten</button><span class="note" id="copied"></span></div>
+      </details>
+      <details>
+        <summary>Sådan virker det</summary>
+        <div id="howto"></div>
+      </details>
+      <details>
+        <summary>Data og kolonner</summary>
+        <div id="dataInfo"></div>
+      </details>
+    </div>
+  </section>
+
+  <footer>Alt regnes ud her på din egen computer. Ingen data sendes nogen steder hen.</footer>
+</div>
+
+<div id="drop">
+  <div class="box">
+    <h2>Træk jeres data hertil</h2>
+    <p class="muted">Besøgstal fra persontællerne og udlånsdata fra Cicero, som Excel- eller CSV-filer. Gerne flere filer på én gang, fx én pr. år. Helst mindst ét år, gerne to.</p>
+    <p><button id="pick" type="button">Vælg filer</button></p>
+    <p class="note">Filerne bliver på din computer.</p>
+  </div>
+</div>
+<div id="busy"><div class="box"><div class="spinner"></div><div id="busyText">Læser data…</div></div></div>
+<input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv" class="hidden">
+
+<script src="data.js"></script>
+<script>
+"use strict";
+/* ---------- dates (all as whole days since 1970-01-01, UTC) ---------- */
+const DAY = 86400000;
+const dnOf = (y, m, d) => Math.round(Date.UTC(y, m - 1, d) / DAY);
+const ymd = dn => { const t = new Date(dn * DAY); return [t.getUTCFullYear(), t.getUTCMonth() + 1, t.getUTCDate()]; };
+const iso = dn => { const [y, m, d] = ymd(dn); return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`; };
+const fromIso = s => { const m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(String(s || "")); return m ? dnOf(+m[1], +m[2], +m[3]) : null; };
+const wdOf = dn => ((dn + 3) % 7 + 7) % 7; // Monday = 0
+function isoWeek(dn) { const thu = dn - wdOf(dn) + 3; const y = ymd(thu)[0]; return 1 + Math.floor((thu - dnOf(y, 1, 1)) / 7); }
+const dayOfYear = dn => dn - dnOf(ymd(dn)[0], 1, 1) + 1;
+const todayDn = () => { const t = new Date(); return dnOf(t.getFullYear(), t.getMonth() + 1, t.getDate()); };
+const WD = ["mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag"];
+const WDS = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
+const MON = ["jan.", "feb.", "mar.", "apr.", "maj", "jun.", "jul.", "aug.", "sep.", "okt.", "nov.", "dec."];
+const MONL = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"];
+const dShort = dn => { const [, m, d] = ymd(dn); return `${d}. ${MON[m - 1]}`; };
+const dLong = dn => { const [y, m, d] = ymd(dn); return `${d}. ${MONL[m - 1]} ${y}`; };
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const nf = new Intl.NumberFormat("da-DK");
+const nice = x => { x = Math.max(0, x); const r = x < 50 ? 1 : x < 1000 ? 10 : x < 20000 ? 50 : 100; return Math.round(x / r) * r; };
+const fmt = x => nf.format(nice(x));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* ---------- Danish calendar ---------- */
+function easter(y) {
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,
+    f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
+    i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+    month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+  return dnOf(y, month, day);
+}
+const calCache = new Map();
+function calendarYear(y) {
+  if (calCache.has(y)) return calCache.get(y);
+  const e = easter(y), hol = new Map(), add = (dn, n) => hol.set(dn, n);
+  add(dnOf(y, 1, 1), "Nytårsdag"); add(e - 3, "Skærtorsdag"); add(e - 2, "Langfredag"); add(e, "Påskedag");
+  add(e + 1, "2. påskedag"); if (y <= 2023) add(e + 26, "Store bededag"); add(e + 39, "Kristi himmelfartsdag");
+  add(e + 49, "Pinsedag"); add(e + 50, "2. pinsedag"); add(dnOf(y, 6, 5), "Grundlovsdag");
+  add(dnOf(y, 12, 24), "Juleaften"); add(dnOf(y, 12, 25), "Juledag"); add(dnOf(y, 12, 26), "2. juledag"); add(dnOf(y, 12, 31), "Nytårsaften");
+  const r = { hol, easterMonday: e - 6 }; calCache.set(y, r); return r;
+}
+const holidayName = dn => calendarYear(ymd(dn)[0]).hol.get(dn) || null;
+function isEasterBreak(dn) { const c = calendarYear(ymd(dn)[0]); return dn >= c.easterMonday && dn <= c.easterMonday + 2; }
+function isChristmasBreak(dn) { const [, m, d] = ymd(dn); return (m === 12 && d >= 20) || (m === 1 && d <= 2); }
+
+/* Danish national elections and referendums: libraries are often polling stations */
+const BUILTIN_SPECIAL = [
+  ["2019-05-26", "Europaparlamentsvalg"], ["2019-06-05", "Folketingsvalg"], ["2021-11-16", "Kommunal- og regionsrådsvalg"],
+  ["2022-06-01", "Folkeafstemning om forsvarsforbeholdet"], ["2022-11-01", "Folketingsvalg"], ["2024-06-09", "Europaparlamentsvalg"],
+  ["2025-11-18", "Kommunal- og regionsrådsvalg"], ["2026-03-24", "Folketingsvalg"],
+].map(([d, n]) => ({ dato: d, navn: n, type: "valg", builtin: true }));
+
+/* ---------- what we forecast ---------- */
+const MEASURES = {
+  besoeg: { label: "Besøgende", noun: "besøg", dayLead: "Forventet entré pr. dag: hvor mange gange nogen går ind ad døren. Stregen viser det sandsynlige spænd: 8 ud af 10 dage lander inden for det.",
+    heatLead: "Forventet entré pr. time: hvor mange der går ind i hver time.", source: "tællerdata" },
+  udlaan: { label: "Udlån", noun: "udlån", dayLead: "Forventet antal udlån. Stregen viser det sandsynlige spænd: 8 ud af 10 dage lander inden for det.",
+    heatLead: "Forventede udlån pr. time. Viser, hvornår udlånet har mest at lave.", source: "udlånsdata" },
+};
+const LOAN_HEAD = /^(transaktionstype|materialetype|faustnr|isbn|titel|forfatter|laanergruppe|lånergruppe|materialegruppe|dk5placement)$/;
+function detectKind(head, name) {
+  if (head.some(h => LOAN_HEAD.test(String(h == null ? "" : h).trim().toLowerCase()))) return "udlaan";
+  if (/udl[aå]n|faktor|loan/i.test(name)) return "udlaan";
+  return "besoeg";
+}
+
+/* ---------- state ---------- */
+const S = {
+  files: [],          // {name, bytes, kind, map, headerRow, agg, first, last, used, forced}
+  data: { besoeg: new Map(), udlaan: new Map() },
+  measure: "besoeg",
+  view: "entre", why: false, ly: false,
+  branch: null,
+  start: null,
+  special: [],
+  settings: { vinterferieUge: 7, efteraarsferieUge: 42, sommerferieFra: 27, sommerferieTil: 32 },
+};
+const $ = id => document.getElementById(id);
+const busy = (on, text) => { $("busy").classList.toggle("show", on); if (text) $("busyText").textContent = text; };
+const tick = () => new Promise(r => setTimeout(r, 30));
+
+/* ---------- file reading: .xlsx streamed with the browser's own unzip, .csv as text ---------- */
+const unesc = s => s.indexOf("&") < 0 ? s : s.replace(/&(amp|lt|gt|quot|apos|#\d+|#x[0-9a-f]+);/gi, (m, e) =>
+  e[0] === "#" ? String.fromCodePoint(e[1] === "x" || e[1] === "X" ? parseInt(e.slice(2), 16) : +e.slice(1)) : ({ amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" })[e.toLowerCase()]);
+function siText(x) {
+  x = x.replace(/<rPh\b[\s\S]*?<\/rPh>/g, "");
+  let t = "", i = 0;
+  for (;;) {
+    const s = x.indexOf("<t", i); if (s < 0) break;
+    const c = x.charCodeAt(s + 2); if (c !== 62 && c !== 32) { i = s + 2; continue; }
+    const gt = x.indexOf(">", s); if (x.charCodeAt(gt - 1) === 47) { i = gt + 1; continue; }
+    const e = x.indexOf("</t>", gt); t += x.slice(gt + 1, e); i = e + 4;
+  }
+  return unesc(t);
+}
+function zipEntries(u8) {
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  let eocd = -1;
+  for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error("filen er ikke en gyldig .xlsx-fil");
+  let n = dv.getUint16(eocd + 10, true), off = dv.getUint32(eocd + 16, true);
+  if (off === 0xffffffff && eocd >= 20 && dv.getUint32(eocd - 20, true) === 0x07064b50) {
+    const z = Number(dv.getBigUint64(eocd - 12, true));
+    n = Number(dv.getBigUint64(z + 32, true)); off = Number(dv.getBigUint64(z + 48, true));
+  }
+  const out = new Map(), td = new TextDecoder();
+  for (let k = 0; k < n; k++) {
+    if (dv.getUint32(off, true) !== 0x02014b50) break;
+    const method = dv.getUint16(off + 10, true), nl = dv.getUint16(off + 28, true), xl = dv.getUint16(off + 30, true), cl = dv.getUint16(off + 32, true);
+    let csize = dv.getUint32(off + 20, true), usize = dv.getUint32(off + 24, true), lho = dv.getUint32(off + 42, true);
+    const name = td.decode(u8.subarray(off + 46, off + 46 + nl));
+    for (let p = off + 46 + nl; p < off + 46 + nl + xl;) { // zip64 sizes
+      const id = dv.getUint16(p, true), sz = dv.getUint16(p + 2, true);
+      if (id === 1) { let q = p + 4;
+        if (usize === 0xffffffff) { usize = Number(dv.getBigUint64(q, true)); q += 8; }
+        if (csize === 0xffffffff) { csize = Number(dv.getBigUint64(q, true)); q += 8; }
+        if (lho === 0xffffffff) { lho = Number(dv.getBigUint64(q, true)); } }
+      p += 4 + sz;
+    }
+    out.set(name, { method, csize, usize, lho });
+    off += 46 + nl + xl + cl;
+  }
+  return out;
+}
+function zipText(u8, e) {
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  const start = e.lho + 30 + dv.getUint16(e.lho + 26, true) + dv.getUint16(e.lho + 28, true);
+  let s = new Blob([u8.subarray(start, start + e.csize)]).stream();
+  if (e.method === 8) s = s.pipeThrough(new DecompressionStream("deflate-raw"));
+  return s.pipeThrough(new TextDecoderStream());
+}
+const yieldUI = () => new Promise(r => setTimeout(r, 0));
+async function eachChunk(stream, fn) {
+  const rd = stream.getReader(); let t = Date.now();
+  for (;;) {
+    const { value, done } = await rd.read(); if (done) return;
+    if (fn(value) === false) { await rd.cancel(); return; }
+    if (Date.now() - t > 150) { await yieldUI(); t = Date.now(); }
+  }
+}
+async function sharedStrings(u8, ents) {
+  const e = ents.get("xl/sharedStrings.xml"), out = []; if (!e) return out;
+  let buf = "";
+  await eachChunk(zipText(u8, e), chunk => {
+    buf += chunk; let pos = 0;
+    for (;;) {
+      const s = buf.indexOf("<si", pos); if (s < 0) break;
+      if (buf.charCodeAt(s + 3) === 47) { out.push(""); pos = s + 5; continue; }
+      const end = buf.indexOf("</si>", s); if (end < 0) break;
+      out.push(siText(buf.slice(s, end))); pos = end + 5;
+    }
+    buf = buf.slice(pos);
+  });
+  return out;
+}
+function parseCells(x, ss) {
+  const cells = []; let i = 0, next = 0;
+  for (;;) {
+    const s = x.indexOf("<c", i); if (s < 0) break;
+    const ch = x.charCodeAt(s + 2); if (ch !== 32 && ch !== 62 && ch !== 47) { i = s + 2; continue; }
+    const gt = x.indexOf(">", s), self = x.charCodeAt(gt - 1) === 47, attrs = x.slice(s + 2, self ? gt - 1 : gt);
+    let col = next; const r = attrs.indexOf(' r="');
+    if (r >= 0) { col = 0; for (let k = r + 4; ; k++) { const c = attrs.charCodeAt(k); if (c >= 65 && c <= 90) col = col * 26 + c - 64; else break; } col -= 1; }
+    next = col + 1;
+    if (self) { i = gt + 1; continue; }
+    const tp = attrs.indexOf(' t="'), t = tp >= 0 ? attrs.slice(tp + 4, attrs.indexOf('"', tp + 4)) : "n";
+    const end = x.indexOf("</c>", gt), inner = x.slice(gt + 1, end); i = end + 4;
+    let v = null;
+    if (t === "inlineStr") v = siText(inner);
+    else { const vs = inner.indexOf("<v>"); if (vs >= 0) { const raw = inner.slice(vs + 3, inner.indexOf("</v>", vs));
+      v = t === "s" ? ss[+raw] : t === "str" ? unesc(raw) : t === "b" ? raw === "1" : t === "e" ? null : +raw; } }
+    cells[col] = v;
+  }
+  return cells;
+}
+async function xlsxRows(u8, onRow) {
+  const ents = zipEntries(u8);
+  let sheet = null; for (const [n, e] of ents) if (/^xl\/worksheets\/sheet\d+\.xml$/.test(n) && (!sheet || e.usize > sheet.usize)) sheet = e;
+  if (!sheet) throw new Error("fandt intet regneark i filen");
+  const ss = await sharedStrings(u8, ents);
+  const ROW = /<row\b[^>]*?(?:\/>|>([\s\S]*?)<\/row>)/g;
+  let buf = "";
+  await eachChunk(zipText(u8, sheet), chunk => {
+    buf += chunk;
+    const last = buf.lastIndexOf("</row>"); if (last < 0) return;
+    const block = buf.slice(0, last + 6); buf = buf.slice(last + 6);
+    ROW.lastIndex = 0; let m;
+    while ((m = ROW.exec(block))) if (m[1] !== undefined && onRow(parseCells(m[1], ss)) === false) return false;
+  });
+}
+function csvRows(u8, onRow) {
+  let text; try { text = new TextDecoder("utf-8", { fatal: true }).decode(u8); } catch (e) { text = new TextDecoder("windows-1252").decode(u8); }
+  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
+  const nl = text.indexOf("\n"), first = text.slice(0, nl < 0 ? text.length : nl);
+  const sep = [";", ",", "\t"].map(c => [c, first.split(c).length]).sort((a, b) => b[1] - a[1])[0][0];
+  let row = [], f = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; continue; }
+    if (c === '"') q = true;
+    else if (c === sep) { row.push(f); f = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(f); f = ""; if (onRow(row) === false) return; row = []; }
+    else f += c;
+  }
+  if (f !== "" || row.length) { row.push(f); onRow(row); }
+}
+
+
+/* ---------- columns ---------- */
+function findHeader(rows) {
+  for (let i = 0; i < Math.min(rows.length, 25); i++) {
+    const r = rows[i] || [];
+    const ne = r.filter(v => v !== null && v !== undefined && v !== "").length;
+    const st = r.filter(v => typeof v === "string" && v.trim() !== "").length;
+    if (ne >= 2 && st >= 2 && st >= ne * 0.6) return i;
+  }
+  return 0;
+}
+function parseDateCell(v) {
+  if (typeof v === "number") {
+    if (v > 20000 && v < 80000) { const whole = Math.floor(v + 1e-9), frac = v - whole; return { dn: whole - 25569, hour: frac > 1e-6 ? Math.floor(frac * 24 + 1e-6) : null }; }
+    return null;
+  }
+  if (typeof v === "string") {
+    let m = /^\s*(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):)?/.exec(v);
+    if (m) return { dn: dnOf(+m[1], +m[2], +m[3]), hour: m[4] != null ? +m[4] : null };
+    m = /^\s*(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})(?:\s+(\d{1,2})[:.])?/.exec(v);
+    if (m) return { dn: dnOf(+m[3], +m[2], +m[1]), hour: m[4] != null ? +m[4] : null };
+  }
+  return null;
+}
+function parseHour(v) {
+  if (typeof v === "number") {
+    if (v >= 0 && v < 1) return Math.floor(v * 24 + 1e-6);
+    if (Number.isInteger(v) && v >= 0 && v <= 23) return v;
+    if (v > 20000) return Math.floor((v - Math.floor(v)) * 24 + 1e-6);
+    return null;
+  }
+  if (typeof v === "string") { const m = /^\s*(\d{1,2})(?:[:.]|\s*-|\s*$)/.exec(v); if (m && +m[1] <= 23) return +m[1]; }
+  return null;
+}
+function parseCount(v) {
+  if (typeof v === "number" && isFinite(v)) return v;
+  if (typeof v === "string" && /^\s*-?\d+([.,]\d+)?\s*$/.test(v)) return parseFloat(v.replace(",", "."));
+  return null;
+}
+const HINTS = {
+  date: [/^yyyy-mm-dd$/, /^dato$/, /^date$/, /^day$/, /^dag$/, /^dato\b/, /^localtime$/, /dato|date/],
+  hour: [/^from hh:mm:ss$/, /^hour number$/, /^tidspunkt$/, /^time$/, /^hour$/, /^fra\b/, /^kl\.?$/, /hour|tidspunkt/],
+  count: [/rettet antal/, /kombineret i alt/, /^total_in$/, /peoplecount_in_amount/, /^besøgende$/, /^besøg$/, /besøgende, der går ind/, /_in$/, /^antal$/, /antal|count|total|besøg/],
+  out: [/^total_out$/, /peoplecount_out_amount/, /besøgende, der går ud/, /_out$/, /^ud$/],
+  branch: [/^bibliotek$/, /^filial$/, /^branchname$/, /^branch$/, /^peoplecountername$/, /^lokation$/, /^afdeling$/, /bibliotek|filial|branch/],
+};
+function detectColumns(rows, h, fileName) {
+  const head = (rows[h] || []).map(x => String(x == null ? "" : x).trim().toLowerCase());
+  const sample = rows.slice(h + 1).filter(r => r && r.some(v => v !== null && v !== undefined && v !== ""));
+  const ok = (ci, test, need) => { let n = 0, t = 0; for (const r of sample) { const v = r[ci]; if (v === null || v === undefined || v === "") continue; t++; if (test(v)) n++; } return t > 0 && n / t >= need; };
+  const pick = (kind, test, need, avoid = []) => {
+    for (const re of HINTS[kind]) for (let ci = 0; ci < head.length; ci++) {
+      if (avoid.includes(ci) || !re.test(head[ci])) continue;
+      if (!test || ok(ci, test, need)) return ci;
+    }
+    return null;
+  };
+  const date = pick("date", v => parseDateCell(v) !== null, 0.8);
+  const hour = pick("hour", v => parseHour(v) !== null, 0.8, [date]);
+  const count = pick("count", v => parseCount(v) !== null, 0.6, [date, hour]);
+  const branch = pick("branch", v => typeof v === "string" && !/^dummy/i.test(v), 0.5, [date, hour, count]);
+  const out = hour === null ? null : pick("out", v => parseCount(v) !== null, 0.6, [date, hour, count, branch]);
+  return { date, hour, count, branch, out };
+}
+function branchFromFile(name) {
+  const s = name.replace(/\.[a-z]+$/i, "").replace(/samlet\s*besøg|besøgsdata|besoegsdata|besøg|besoeg|udlånsdata|udlaansdata|udlån|faktor|data|ny\b/gi, " ")
+    .replace(/[_\-]+/g, " ").replace(/\b(k\d|\d{2,4})\b/gi, " ").replace(/\s+/g, " ").trim();
+  return s ? cap(s) : "Biblioteket";
+}
+
+/* ---------- reading one file into daily and hourly totals ---------- */
+async function processFile(f) {
+  const sample = []; let settled = false, n = 0;
+  const agg = new Map(), getA = b => { if (!agg.has(b)) agg.set(b, { daily: new Map(), hourly: new Map(), hourlyOut: new Map(), hourlyTotal: 0, total: 0 }); return agg.get(b); };
+  f.first = null; f.last = null; f.used = 0;
+  const fallback = branchFromFile(f.name);
+  const add = r => {
+    const m = f.map; if (m.date == null || m.count == null) return;
+    const d = parseDateCell(r[m.date]); if (!d) return;
+    const c = parseCount(r[m.count]); if (c === null) return;
+    let b = m.branch != null ? r[m.branch] : fallback; b = b == null ? "" : String(b).trim();
+    if (!b || /^(false|true|dummy.*|ukendt|unknown)$/i.test(b)) return;
+    const hr = m.hour != null ? parseHour(r[m.hour]) : d.hour;
+    const A = getA(b);
+    A.daily.set(d.dn, (A.daily.get(d.dn) || 0) + c); A.total += c;
+    if (hr !== null) { const k = d.dn * 24 + hr; A.hourly.set(k, (A.hourly.get(k) || 0) + c); A.hourlyTotal += c;
+      if (m.out != null) { const o = parseCount(r[m.out]); if (o !== null) A.hourlyOut.set(k, (A.hourlyOut.get(k) || 0) + o); } }
+    f.used++; if (f.first === null || d.dn < f.first) f.first = d.dn; if (f.last === null || d.dn > f.last) f.last = d.dn;
+  };
+  const settle = () => {
+    settled = true;
+    const h = findHeader(sample);
+    f.headerRow = sample[h] || [];
+    if (!f.forced) { f.map = detectColumns(sample, h, f.name); f.kind = detectKind(f.headerRow, f.name); }
+    for (let i = h + 1; i < sample.length; i++) add(sample[i]);
+  };
+  const onRow = r => {
+    n++;
+    if (n % 50000 === 0) $("busyText").textContent = `Læser ${f.name}: ${nf.format(n)} rækker…`;
+    if (!settled) { sample.push(r); if (sample.length >= 400) settle(); return; }
+    add(r);
+  };
+  if (/\.csv$|\.txt$/i.test(f.name)) csvRows(f.bytes, onRow);
+  else if (/\.xls$/i.test(f.name)) throw new Error("gamle .xls-filer kan ikke læses; gem filen som .xlsx eller .csv i Excel");
+  else await xlsxRows(f.bytes, onRow);
+  if (!settled) settle();
+  f.agg = agg;
+}
+function b64ToBytes(b64) {
+  if (Uint8Array.fromBase64) return Uint8Array.fromBase64(b64);
+  const bin = atob(b64), u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return u;
+}
+async function loadSources(sources) {
+  for (let i = 0; i < sources.length; i++) {
+    const s = sources[i];
+    busy(true, `Læser ${s.name} (${i + 1} af ${sources.length})…`); await tick();
+    try {
+      const f = { name: s.name, bytes: s.bytes(), forced: false };
+      await processFile(f);
+      S.files = S.files.filter(x => x.name !== f.name).concat([f]);
+    } catch (err) {
+      warn(`Kunne ikke læse ${esc(s.name)}: ${esc(err.message || err)}`, true);
+    }
+  }
+  busy(true, "Regner…"); await tick();
+  rebuild();
+  busy(false);
+}
+
+function combine() {
+  for (const kind of Object.keys(MEASURES)) {
+    const out = new Map();
+    for (const f of S.files) if (f.kind === kind && f.agg) for (const [b, A] of f.agg) {
+      if (!out.has(b)) out.set(b, { daily: new Map(), hourly: new Map(), hourlyOut: new Map(), hourlyTotal: 0, total: 0 });
+      const O = out.get(b);
+      for (const [k, v] of A.daily) O.daily.set(k, (O.daily.get(k) || 0) + v);
+      for (const [k, v] of A.hourly) O.hourly.set(k, (O.hourly.get(k) || 0) + v);
+      for (const [k, v] of A.hourlyOut || []) O.hourlyOut.set(k, (O.hourlyOut.get(k) || 0) + v);
+      O.hourlyTotal += A.hourlyTotal; O.total += A.total;
+    }
+    if (kind === "udlaan") for (const A of out.values()) { // a loan export has no rows on days without loans: those days are zero
+      const ks = [...A.daily.keys()]; if (!ks.length) continue;
+      const lo = Math.min(...ks), hi = Math.max(...ks);
+      for (let d = lo; d <= hi; d++) if (!A.daily.has(d)) A.daily.set(d, 0);
+    }
+    if (out.size > 1) {
+      const all = { daily: new Map(), hourly: new Map(), hourlyOut: new Map(), hourlyTotal: 0, total: 0 };
+      for (const A of out.values()) {
+        for (const [k, v] of A.daily) all.daily.set(k, (all.daily.get(k) || 0) + v);
+        for (const [k, v] of A.hourly) all.hourly.set(k, (all.hourly.get(k) || 0) + v);
+        for (const [k, v] of A.hourlyOut) all.hourlyOut.set(k, (all.hourlyOut.get(k) || 0) + v);
+        all.hourlyTotal += A.hourlyTotal; all.total += A.total;
+      }
+      out.set("Alle (samlet)", all);
+    }
+    S.data[kind] = out;
+  }
+}
+function branchNames() {
+  const score = new Map();
+  for (const kind of Object.keys(MEASURES)) for (const [b, A] of S.data[kind]) score.set(b, Math.max(score.get(b) || 0, A.total));
+  const names = [...score.keys()].filter(b => b !== "Alle (samlet)").sort((a, b) => score.get(b) - score.get(a));
+  if (score.has("Alle (samlet)")) names.push("Alle (samlet)");
+  return names;
+}
+
+/* ---------- the model ---------- */
+// Linear regression on log(1 + count per day). Inputs: weekday, a smooth curve over the year,
+// holidays, school breaks and a slow trend, weighted toward recent days (half-life one year) and
+// shifted to the level of the last 8 weeks (ideas from exponential smoothing). Elections and events are added as extra counts on
+// top of a normal day, learned from earlier days of the same type.
+function specialMap() { const m = new Map(); for (const s of S.special) { const dn = fromIso(s.dato); if (dn !== null) m.set(dn, s); } return m; }
+function dayFlags(dn, sp) {
+  const w = isoWeek(dn), st = S.settings, s = sp.get(dn);
+  return {
+    hol: holidayName(dn) !== null, jul: isChristmasBreak(dn) && holidayName(dn) === null, paaske: isEasterBreak(dn),
+    vinter: w === +st.vinterferieUge, efteraar: w === +st.efteraarsferieUge, sommer: w >= +st.sommerferieFra && w <= +st.sommerferieTil,
+    valg: !!s && s.type === "valg", arrangement: !!s && s.type === "arrangement", lukket: !!s && s.type === "lukket",
+  };
+}
+const FLAG_NAMES = ["hol", "jul", "paaske", "vinter", "efteraar", "sommer"];
+const EXTRA_TYPES = ["valg", "arrangement"];
+function design(dn, spec, sp) {
+  const x = [1];
+  if (spec.weekday) for (let k = 1; k < 7; k++) x.push(wdOf(dn) === k ? 1 : 0);
+  if (spec.K) { const t = 2 * Math.PI * dayOfYear(dn) / 365.25; for (let k = 1; k <= spec.K; k++) x.push(Math.sin(k * t), Math.cos(k * t)); }
+  const f = dayFlags(dn, sp);
+  for (const n of spec.flags) x.push(f[n] ? 1 : 0);
+  if (spec.trend) x.push((Math.min(dn, spec.trendEnd) - spec.t0) / 365.25);
+  if (spec.wx) x.push(hotOf(dn), coldOf(dn));
+  if (spec.rain) x.push(isBreak(dn) ? rainOf(dn) : 0);
+  if (spec.rainWe) x.push(isWeekendOff(dn) ? rainOf(dn) : 0);
+  return x;
+}
+
+/* ---------- weather (optional; the agent fetches it from Open-Meteo into data.js) ----------
+   Two variables, each with its own coefficient per library: degrees warmer than normal beyond 3 °C,
+   and degrees colder than normal beyond 3 °C. Heat lowered visits at every branch in the test data; the effect
+   of cold differed from branch to branch (strongly negative for the book bus). Rain did not help. */
+const WX = { tmax: new Map(), rain: new Map(), clim: null, forecastTo: null };
+function loadWeather() {
+  const hist = window.PROGNOSE_VEJR_HISTORIK, fc = window.PROGNOSE_VEJR_PROGNOSE;
+  for (const src of [hist, fc]) {
+    const d = src && src.daily; if (!d || !Array.isArray(d.time) || !Array.isArray(d.temperature_2m_max)) continue;
+    d.time.forEach((t, i) => { const dn = fromIso(t), v = d.temperature_2m_max[i];
+      if (dn !== null && typeof v === "number" && !WX.tmax.has(dn)) WX.tmax.set(dn, v);
+      const r = Array.isArray(d.precipitation_sum) ? d.precipitation_sum[i] : null;
+      if (dn !== null && typeof r === "number" && !WX.rain.has(dn)) WX.rain.set(dn, r);
+      if (src === fc && dn !== null && typeof v === "number") WX.forecastTo = Math.max(WX.forecastTo || dn, dn); });
+  }
+  if (WX.tmax.size < 730) return;
+  // normal temperature for each day of the year: 15-day average, averaged over all years, smoothed again
+  const sum = new Array(366).fill(0), n = new Array(366).fill(0);
+  for (const dn of WX.tmax.keys()) {
+    let s = 0, c = 0; for (let k = -7; k <= 7; k++) { const v = WX.tmax.get(dn + k); if (v !== undefined) { s += v; c++; } }
+    const j = Math.min(dayOfYear(dn), 365) - 1; sum[j] += s / c; n[j]++;
+  }
+  const raw = sum.map((s, j) => n[j] ? s / n[j] : null);
+  if (raw.slice(0, 365).some(v => v === null)) return;
+  WX.clim = raw.slice(0, 365).map((_, j) => { let s = 0; for (let k = -7; k <= 7; k++) s += raw[(j + k + 365) % 365]; return s / 15; });
+}
+const tempAnom = dn => { const v = WX.tmax.get(dn); return v === undefined || !WX.clim ? null : v - WX.clim[Math.min(dayOfYear(dn), 365) - 1]; };
+const hotOf = dn => { const a = tempAnom(dn); return a === null ? 0 : Math.max(0, a - 3) / 10; };
+// rain: log(1 + mm). On school-break days it draws people in (test data, same summer week: about +5 to 10 %
+// at 10 mm at most branches; children +30 % on rainy days off while other adults stay away), and it changes
+// how long people stay. On ordinary days it did not change the number of entries.
+const rainOf = dn => Math.log1p(WX.rain.get(dn) || 0);
+const isBreak = dn => { const f = dayFlags(dn, new Map()); return f.jul || f.paaske || f.vinter || f.efteraar || f.sommer; };
+const isWeekendOff = dn => !isBreak(dn) && (wdOf(dn) >= 5 || holidayName(dn) !== null);
+const isFree = dn => { if (wdOf(dn) >= 5 || holidayName(dn) !== null) return true; const f = dayFlags(dn, new Map()); return f.jul || f.paaske || f.vinter || f.efteraar || f.sommer; };
+const coldOf = dn => { const a = tempAnom(dn); return a === null ? 0 : Math.max(0, -a - 3) / 10; };
+function solve(A, b) {
+  const n = b.length, M = A.map((r, i) => r.concat([b[i]]));
+  for (let c = 0; c < n; c++) {
+    let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]];
+    const piv = M[c][c] || 1e-12;
+    for (let r = c + 1; r < n; r++) { const f = M[r][c] / piv; if (f) for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+  }
+  const x = new Array(n).fill(0);
+  for (let r = n - 1; r >= 0; r--) { let s = M[r][n]; for (let k = r + 1; k < n; k++) s -= M[r][k] * x[k]; x[r] = s / (M[r][r] || 1e-12); }
+  return x;
+}
+const quantile = (arr, q) => { if (!arr.length) return 0; const a = [...arr].sort((x, y) => x - y); const i = (a.length - 1) * q, lo = Math.floor(i); return a[lo] + (a[Math.min(lo + 1, a.length - 1)] - a[lo]) * (i - lo); };
+const median = a => quantile(a, 0.5);
+
+function trainingDays(daily, before, sp) {
+  const days = [...daily.keys()].filter(d => d < before).sort((a, b) => a - b);
+  const byWd = [[], [], [], [], [], [], []];
+  for (const d of days) if (holidayName(d) === null) byWd[wdOf(d)].push(daily.get(d));
+  const med = byWd.map(median);
+  const keep = [], dropped = [];
+  for (const d of days) {
+    const y = daily.get(d), f = dayFlags(d, sp);
+    if (f.lukket) { dropped.push({ dn: d, why: "lukket" }); continue; }
+    if (f.valg || f.arrangement) { dropped.push({ dn: d, why: "særlig dag", special: true }); continue; }
+    if (!f.hol && med[wdOf(d)] >= 20 && y < 0.1 * med[wdOf(d)]) { dropped.push({ dn: d, why: "sandsynligvis fejl i data" }); continue; }
+    keep.push(d);
+  }
+  return { keep, dropped };
+}
+function fit(daily, before, sp) {
+  const { keep, dropped } = trainingDays(daily, before, sp);
+  if (keep.length < 28) return { error: "For lidt data", n: keep.length };
+  const span = keep[keep.length - 1] - keep[0] + 1;
+  const spec = { weekday: true, K: span >= 330 ? 4 : span >= 180 ? 2 : 0, flags: [], trend: span >= 540, t0: keep[0], trendEnd: keep[keep.length - 1] };
+  for (const n of FLAG_NAMES) { let c = 0; for (const d of keep) if (dayFlags(d, sp)[n]) c++; if (c > 0) spec.flags.push(n); }
+  spec.wx = !!WX.clim && keep.filter(d => WX.tmax.has(d)).length >= 330;
+  spec.rain = keep.filter(d => WX.rain.has(d) && isBreak(d)).length >= 30;
+  spec.rainWe = keep.filter(d => WX.rain.has(d) && isWeekendOff(d)).length >= 30;
+  const idx = { four: [], flags: [] };
+  { let k = 1 + (spec.weekday ? 6 : 0); for (let i = 0; i < 2 * spec.K; i++) idx.four.push(k++); for (const n of spec.flags) idx.flags.push([n, k++]);
+    idx.trend = spec.trend ? k++ : -1; idx.hot = spec.wx ? k++ : -1; idx.cold = spec.wx ? k++ : -1; idx.rain = spec.rain ? k++ : -1; idx.rainWe = spec.rainWe ? k++ : -1; }
+  const X = keep.map(d => design(d, spec, sp)), y = keep.map(d => Math.log1p(daily.get(d)));
+  // Borrowed from exponential smoothing (Excel's FORECAST.ETS): recent days weigh more (half-life one year) ...
+  const last = keep[keep.length - 1], w = keep.map(d => Math.pow(0.5, (last - d) / 365));
+  const p = X[0].length, XtX = Array.from({ length: p }, () => new Array(p).fill(0)), Xty = new Array(p).fill(0);
+  for (let i = 0; i < X.length; i++) { const xi = X[i], wi = w[i]; for (let a = 0; a < p; a++) { Xty[a] += wi * xi[a] * y[i]; for (let b = a; b < p; b++) XtX[a][b] += wi * xi[a] * xi[b]; } }
+  for (let a = 0; a < p; a++) { for (let b = 0; b < a; b++) XtX[a][b] = XtX[b][a]; if (a > 0) XtX[a][a] += 1e-3; }
+  { const nw = (spec.wx ? 2 : 0) + (spec.rain ? 1 : 0) + (spec.rainWe ? 1 : 0); for (let a = p - nw; a < p; a++) XtX[a][a] += 1; } // pull the weather effects toward 0: unusual days are few, and the cold effect is noisy
+  const beta = solve(XtX, Xty);
+  const pred0 = d => { const x = design(d, spec, sp); let s = 0; for (let k = 0; k < p; k++) s += x[k] * beta[k]; return s; };
+  // ... and the level follows the last 8 weeks: the typical (median) miss on those days is added to every forecast.
+  // The median, not the mean, so a few odd days (a half-closed day, a broken counter) don't move the whole forecast.
+  const recent = keep.map((d, i) => d > last - 56 ? y[i] - pred0(d) : null).filter(r => r !== null).sort((a, b) => a - b);
+  const level = recent.length >= 14 ? recent[recent.length >> 1] : 0;
+  const pred = d => pred0(d) + level;
+  const res = keep.map((d, i) => y[i] - pred(d));
+  const set = new Set(keep), wres = [];
+  for (const d of keep) if (wdOf(d) === 0) {
+    let a = 0, b = 0, full = true;
+    for (let k = 0; k < 7; k++) { if (!set.has(d + k)) { full = false; break; } a += daily.get(d + k); b += Math.expm1(pred(d + k)); }
+    if (full && a > 0 && b > 0) wres.push(Math.log(a / b));
+  }
+  const extra = {};
+  for (const t of EXTRA_TYPES) {
+    const xs = dropped.filter(x => x.special && dayFlags(x.dn, sp)[t]).map(x => ({ dn: x.dn, extra: daily.get(x.dn) - Math.expm1(pred(x.dn)) }));
+    if (xs.length) { const v = xs.map(x => x.extra); extra[t] = { mean: v.reduce((a, b) => a + b, 0) / v.length, min: Math.min(...v), max: Math.max(...v), days: xs }; }
+  }
+  const dq = [quantile(res, 0.1), quantile(res, 0.9)];
+  const predDay = d => {
+    const f = dayFlags(d, sp);
+    if (f.lukket) return { mid: 0, lo: 0, hi: 0, closed: true };
+    const l = pred(d), r = { mid: Math.expm1(l), lo: Math.expm1(l + dq[0]), hi: Math.expm1(l + dq[1]) };
+    for (const t of EXTRA_TYPES) if (f[t] && extra[t]) { r.mid += extra[t].mean; r.lo += Math.min(extra[t].min, extra[t].mean); r.hi += Math.max(extra[t].max, extra[t].mean); r.special = t; }
+    r.mid = Math.max(0, r.mid); r.lo = Math.max(0, r.lo);
+    return r;
+  };
+  return {
+    spec, beta, pred, predDay, extra, keep, dropped, level, idx, trendPerYear: spec.trend ? Math.expm1(beta[idx.trend]) : null, wxEff: spec.wx ? { hot: beta[idx.hot], cold: beta[idx.cold] } : null, rainEff: spec.rain ? beta[idx.rain] : null, rainWeEff: spec.rainWe ? beta[idx.rainWe] : null, first: keep[0], last: keep[keep.length - 1], dq,
+    wq: wres.length >= 8 ? [quantile(wres, 0.1), quantile(wres, 0.9)] : [dq[0] / 2, dq[1] / 2],
+    coef: name => { const i = spec.flags.indexOf(name); if (i < 0) return null; return beta[1 + (spec.weekday ? 6 : 0) + 2 * spec.K + i]; },
+  };
+}
+function forecastWeek(M, start, sp) {
+  const days = [];
+  for (let k = 0; k < 7; k++) days.push(Object.assign({ dn: start + k }, M.predDay(start + k)));
+  const mid = days.reduce((s, d) => s + d.mid, 0);
+  let base = 0, sLo = 0, sHi = 0;
+  for (const d of days) { const f = dayFlags(d.dn, sp); const t = EXTRA_TYPES.find(t => f[t] && M.extra[t]);
+    if (t) { const e = M.extra[t]; base += Math.max(0, d.mid - e.mean); sLo += Math.min(e.min, e.mean); sHi += Math.max(e.max, e.mean); } else base += d.mid; }
+  return { days, mid, lo: Math.max(0, base * Math.exp(M.wq[0]) + sLo), hi: base * Math.exp(M.wq[1]) + sHi };
+}
+function backtest(daily, before, sp) {
+  const all = [...daily.keys()].filter(d => d < before).sort((a, b) => a - b);
+  if (!all.length) return null;
+  const end = all[all.length - 1] + 1;
+  const cut = end - 56 - wdOf(end - 56);
+  if (cut - all[0] < 365) return null;
+  const M = fit(daily, cut, sp); if (M.error) return null;
+  const keepSet = new Set(trainingDays(daily, end, sp).keep);
+  const pts = [], weeks = [], naive = [];
+  for (let w = 0; w < 8; w++) {
+    let a = 0, b = 0, full = true;
+    for (let k = 0; k < 7; k++) {
+      const d = cut + 7 * w + k; if (d >= end) { full = false; break; }
+      const r = M.predDay(d), y = daily.has(d) ? daily.get(d) : null;
+      pts.push({ dn: d, y, p: r.mid, lo: r.lo, hi: r.hi });
+      if (y === null) { full = false; continue; }
+      if (!(keepSet.has(d) || r.special)) continue; // closed day or a data fault: leave it out of both sums
+      a += y; b += r.mid;
+    }
+    if (full && a > 0) {
+      weeks.push(Math.abs(b - a) / a);
+      let ly = 0, lfull = true; for (let k = 0; k < 7; k++) { const d = cut + 7 * w + k - 364; if (!daily.has(d)) { lfull = false; break; } ly += daily.get(d); }
+      if (lfull) naive.push(Math.abs(ly - a) / a);
+    }
+  }
+  if (!weeks.length) return null;
+  const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+  return { pts, weekErr: mean(weeks), naiveErr: naive.length === weeks.length ? mean(naive) : null, nWeeks: weeks.length, from: cut };
+}
+function hourProfile(A, before) {
+  if (!A.hourlyTotal || A.hourlyTotal < 0.5 * A.total) return null;
+  const days = [...A.daily.keys()].filter(d => d < before).sort((a, b) => a - b);
+  if (!days.length) return null;
+  const from = days[days.length - 1] - 364;
+  const sums = Array.from({ length: 7 }, () => new Array(24).fill(0)), tot = new Array(7).fill(0);
+  for (const d of days) {
+    if (d < from || holidayName(d) !== null) continue;
+    const w = wdOf(d);
+    for (let h = 0; h < 24; h++) { const v = A.hourly.get(d * 24 + h); if (v) { sums[w][h] += v; tot[w] += v; } }
+  }
+  return sums.map((r, w) => r.map(v => tot[w] ? v / tot[w] : 0));
+}
+/* People in the house: a running sum of in minus out through the day, averaged over each hour.
+   Counters rarely agree with themselves (one test library counted about 10 % more out than in), so each day's
+   outs are scaled to match its ins: the house is empty at closing. Stay length is modelled per day,
+   so a hot day can mean people come in but leave sooner. */
+function occupancy(A, before) {
+  if (!A.hourlyOut || A.hourlyOut.size < 100) return null;
+  const days = [...A.daily.keys()].filter(d => d < before).sort((a, b) => a - b); if (!days.length) return null;
+  const from = days[days.length - 1] - 364;
+  const sums = Array.from({ length: 7 }, () => new Array(24).fill(0)), cnt = new Array(7).fill(0), stays = [];
+  const minIn = 0.2 * median(days.map(d => A.daily.get(d)).filter(v => v > 0)); // skip near-empty days: their stay estimates are noise
+  for (const d of days) {
+    const o = occRow(A, d); if (!o || o.tin < Math.max(30, minIn)) continue;
+    const area = o.row.reduce((a, v) => a + v, 0); if (area <= 0) continue;
+    stays.push({ dn: d, min: area / o.tin * 60 });
+    if (d >= from && holidayName(d) === null) { const w = wdOf(d); for (let h = 0; h < 24; h++) sums[w][h] += o.row[h] / o.tin; cnt[w]++; }
+  }
+  if (stays.length < 28) return null;
+  const share = sums.map((r, w) => r.map(v => cnt[w] ? v / cnt[w] : 0));
+  // stay length: log(minutes) on weekday, season and (if present) the two weather terms
+  const useWx = !!WX.clim, useRain = WX.rain.size > 0 && stays.filter(s => WX.rain.has(s.dn)).length >= 60;
+  const X = stays.map(s => { const t = 2 * Math.PI * dayOfYear(s.dn) / 365.25, x = [1]; for (let k = 1; k < 7; k++) x.push(wdOf(s.dn) === k ? 1 : 0); x.push(Math.sin(t), Math.cos(t));
+    if (useWx) x.push(hotOf(s.dn), coldOf(s.dn)); if (useRain) { const r = rainOf(s.dn), f = isFree(s.dn); x.push(f ? r : 0, f ? 0 : r); } return x; });
+  const y = stays.map(s => Math.log(s.min)), p = X[0].length, XtX = Array.from({ length: p }, () => new Array(p).fill(0)), Xty = new Array(p).fill(0);
+  for (let i = 0; i < X.length; i++) for (let a = 0; a < p; a++) { Xty[a] += X[i][a] * y[i]; for (let b = 0; b < p; b++) XtX[a][b] += X[i][a] * X[i][b]; }
+  for (let a = 1; a < p; a++) XtX[a][a] += 1e-3;
+  const nw = (useWx ? 2 : 0) + (useRain ? 2 : 0); for (let a = p - nw; a < p; a++) XtX[a][a] += 1;
+  const beta = solve(XtX, Xty), o = useWx ? 7 + 2 : -1, bh = useWx ? beta[o] : 0, bc = useWx ? beta[o + 1] : 0;
+  const ro = 9 + (useWx ? 2 : 0), brf = useRain ? beta[ro] : 0, brw = useRain ? beta[ro + 1] : 0, l10 = Math.log1p(10);
+  return { share, stay: median(stays.map(s => s.min)), hot: useWx ? Math.expm1(bh) : null, cold: useWx ? Math.expm1(bc) : null,
+    rainFree: useRain ? Math.expm1(brf * l10) : null, rainWork: useRain ? Math.expm1(brw * l10) : null,
+    factor: dn => Math.exp(bh * hotOf(dn) + bc * coldOf(dn) + (isFree(dn) ? brf : brw) * rainOf(dn)) };
+}
+// one day's people in the building per hour (average over the hour), outs scaled to match ins
+function occRow(A, d) {
+  if (!A.hourlyOut || !A.hourlyOut.size) return null;
+  let tin = 0, tout = 0; for (let h = 0; h < 24; h++) { tin += A.hourly.get(d * 24 + h) || 0; tout += A.hourlyOut.get(d * 24 + h) || 0; }
+  if (tin <= 0 || tout <= 0) return null;
+  const f = tin / tout, row = new Array(24).fill(0); let c = 0;
+  for (let h = 0; h < 24; h++) { const p = c; c += (A.hourly.get(d * 24 + h) || 0) - f * (A.hourlyOut.get(d * 24 + h) || 0); row[h] = Math.max(0, (p + c) / 2); }
+  return { row, tin };
+}
+const inBuilding = r => r.kind === "besoeg" && !!r.OCC && S.view === "bygning";
+// the week's days in the current view: entries, or the most people in the building at once
+function viewDays(r) {
+  const bld = inBuilding(r), A = r.A, peakOf = dn => { const o = occRow(A, dn); return o ? Math.max(...o.row) : undefined; };
+  return r.F.days.map(d => {
+    const q = bld ? Math.max(...r.OCC.share[wdOf(d.dn)]) * r.OCC.factor(d.dn) : 1;
+    return Object.assign({}, d, { mid: d.mid * q, lo: d.lo * q, hi: d.hi * q, q,
+      actual: bld ? (A.daily.has(d.dn) ? peakOf(d.dn) : undefined) : A.daily.get(d.dn),
+      lastYear: bld ? peakOf(d.dn - 364) : A.daily.get(d.dn - 364) });
+  });
+}
+/* ---------- why: split a day's forecast into its parts ----------
+   The model works on the log scale, so each part is a factor (+12 %, -30 %) and they multiply:
+   an average day right now x weekday x season x holidays/breaks x weather (+ extra for special days). */
+const FLAG_LABEL = { hol: "helligdag", jul: "juleferie", paaske: "påskeferie", vinter: "vinterferie", efteraar: "efterårsferie", sommer: "sommerferie" };
+function contrib(M, dn, sp) {
+  const b = M.beta, x = design(dn, M.spec, sp), I = M.idx, at = i => i >= 0 ? x[i] * b[i] : 0;
+  const wdc = [0]; for (let k = 1; k < 7; k++) wdc.push(M.spec.weekday ? b[k] : 0);
+  const meanWd = wdc.reduce((a, v) => a + v, 0) / 7, season = I.four.reduce((a, i) => a + at(i), 0);
+  const fl = I.flags.filter(([, i]) => x[i]).map(([n, i]) => ({ n, v: b[i] }));
+  const hot = at(I.hot), cold = at(I.cold), rain = at(I.rain) + at(I.rainWe), wl = [];
+  if (Math.abs(hot) > 0.005) wl.push("varmt for årstiden"); if (Math.abs(cold) > 0.005) wl.push("koldt for årstiden"); if (Math.abs(rain) > 0.005) wl.push(isBreak(dn) ? "regn i skoleferien" : wdOf(dn) >= 5 ? "regn i weekenden" : "regn på en helligdag");
+  const pd = M.predDay(dn), t = WX.tmax.get(dn), an = tempAnom(dn), mm = WX.rain.get(dn);
+  const tempLabel = !M.spec.wx ? "ikke med (ingen vejrdata)" : t === undefined ? "ingen vejrprognose" :
+    `${Math.round(t)} °C, ${Math.abs(an) < 0.5 ? "normalt" : `${an > 0 ? "+" : "−"}${Math.abs(an).toFixed(0)} ° ift. normalt`}${Math.abs(an) < 3 ? " (tæller fra ±3°)" : ""}`;
+  const rainLabel = !M.spec.rain && !M.spec.rainWe ? "ikke med (ingen vejrdata)" : mm === undefined ? "ingen vejrprognose" :
+    `${mm < 0.5 ? "tørt" : `${Math.round(mm)} mm`}${isBreak(dn) ? ", skoleferie" : isWeekendOff(dn) ? (wdOf(dn) >= 5 ? ", weekend" : ", helligdag") : mm >= 0.5 ? ", tæller kun på fridage" : ""}`;
+  return { base: Math.expm1(b[0] + meanWd + at(I.trend) + M.level), wd: Math.exp(wdc[wdOf(dn)] - meanWd), season: Math.exp(season),
+    temp: Math.exp(hot + cold), tempLabel, rain: Math.exp(rain), rainLabel,
+    ferie: Math.exp(fl.reduce((a, f) => a + f.v, 0)), ferieLabel: fl.map(f => f.n === "hol" ? (holidayName(dn) || "helligdag") : FLAG_LABEL[f.n]).join(", "),
+    vejr: Math.exp(hot + cold + rain), vejrLabel: wl.join(", "),
+    extra: pd.special && M.extra[pd.special] ? M.extra[pd.special].mean : 0, extraLabel: pd.special ? ((sp.get(dn) || {}).navn || pd.special) : "", closed: !!pd.closed, mid: pd.mid };
+}
+const pctSigned = f => `${f >= 1 ? "+" : "−"}${Math.abs((f - 1) * 100).toFixed(0)} %`;
+/* Additive version for people: baseline + one count per factor = the day's forecast, exactly.
+   The model multiplies factors, so the day's difference from the baseline is shared out in proportion
+   to each factor's pull on the log scale (log-share attribution). Special days add their count directly. */
+function contribCounts(r, dn, sp, bld) {
+  const c = contrib(r.M, dn, sp);
+  if (c.closed) return { closed: true, total: 0, c };
+  const share = bld ? Math.max(...r.OCC.share[wdOf(dn)]) : 1, stay = bld ? r.OCC.factor(dn) : 1;
+  const mult = Math.max(0, Math.expm1(r.M.pred(dn))), base = c.base * share;
+  const logs = { wd: Math.log(c.wd), season: Math.log(c.season), ferie: Math.log(c.ferie), temp: Math.log(c.temp), rain: Math.log(c.rain), stay: Math.log(stay) };
+  const L = Object.values(logs).reduce((a, v) => a + v, 0), D = mult * share * stay - base, parts = {};
+  for (const k in logs) parts[k] = Math.abs(L) < 1e-9 ? 0 : D * logs[k] / L;
+  const extra = c.extra * share * stay, total = base + D + extra;
+  // round to whole numbers that still add up: the rounding remainder goes to the largest part
+  const keys = Object.keys(parts), R = { base: Math.round(base), extra: Math.round(extra) };
+  for (const k of keys) R[k] = Math.round(parts[k]);
+  const tot = Math.round(total), sum = R.base + R.extra + keys.reduce((a, k) => a + R[k], 0);
+  const big = ["extra", ...keys.filter(k => k !== "wd")].reduce((a, k) => Math.abs(R[k]) > Math.abs(R[a]) ? k : a, "season"); R[big] += tot - sum;
+  return { closed: false, R, total: tot, c };
+}
+function renderWhy(r, sp) {
+  const el = $("whyTable"); if (!S.why) { el.innerHTML = ""; return; }
+  const ms = MEASURES[r.kind], bld = inBuilding(r), noun = bld ? "personer" : ms.noun;
+  const X = r.F.days.map(d => contribCounts(r, d.dn, sp, bld));
+  const V = viewDays(r), hasA = V.some(v => v.actual !== undefined);
+  const hasX = X.some(x => !x.closed && x.R.extra), ncol = 6 + hasX + bld;
+  const act = (i, tot) => { if (!hasA) return ""; const a = V[i].actual; if (a === undefined) return `<td class="z">ikke endnu</td>`;
+    const d = tot > 0 ? (a - tot) / tot : null, lab = d === null ? "" : Math.abs(d) < 0.005 ? "ramt" : `${d > 0 ? "+" : "−"}${Math.abs(d * 100).toFixed(0)} % ift. prognosen`;
+    return `<td class="tot">${nf.format(Math.round(a))}${lab ? `<small>${lab}</small>` : ""}</td>`; };
+  const num = (v, lab) => `<td class="${v === 0 ? "z" : v > 0 ? "up" : "dn"}">${v === 0 ? "0" : (v > 0 ? "+" : "−") + nf.format(Math.abs(v))}${lab ? `<small>${esc(lab)}</small>` : ""}</td>`;
+  let h = `<p class="note" style="margin-top:14px">Hvor kommer tallet fra? Hver dag starter i, hvad <b>en almindelig dag af den ugedag</b> giver lige nu${bld ? ", omregnet til personer i bygningen ad gangen" : ""}. De næste kolonner viser, hvor mange ${noun} årstid, ferie, vejr og særlige dage lægger til eller trækker fra, og det hele summer præcis til prognosen. Temperatur tæller kun, når dagen er mere end 3 °C fra det normale for årstiden, og regn kun på fridage (skoleferier, weekender og helligdage): det er der, testene viste en effekt.</p>`;
+  h += `<div class="heat"><table class="why"><thead><tr><th class="row"></th><th>Almindelig ugedag</th><th>Årstid</th><th>Ferie og helligdage</th><th>Temperatur</th><th>Regn</th>${bld ? "<th>Opholdstid</th>" : ""}${hasX ? "<th>Særlig dag</th>" : ""}<th>= Prognose</th>${hasA ? "<th>Faktisk</th>" : ""}</tr></thead><tbody>`;
+  X.forEach((x, i) => {
+    const dn = r.F.days[i].dn;
+    h += `<tr><th class="row">${WDS[wdOf(dn)]} ${dShort(dn)}</th>`;
+    if (x.closed) h += `<td colspan="${ncol - 1}" class="z">Lukket</td><td class="tot">0</td>` + act(i, 0);
+    else {
+      const R = x.R, c = x.c;
+      h += `<td>${nf.format(R.base + R.wd)}<small>en almindelig ${WD[wdOf(dn)]}</small></td>` + num(R.season) + num(R.ferie, c.ferieLabel || "ingen") + num(R.temp, c.tempLabel) + num(R.rain, c.rainLabel);
+      if (bld) h += num(R.stay, "vejrets effekt på, hvor længe folk bliver");
+      if (hasX) h += R.extra ? num(R.extra, c.extraLabel) : `<td class="z">0</td>`;
+      h += `<td class="tot">${nf.format(x.total)}</td>` + act(i, x.total);
+    }
+    h += `</tr>`;
+  });
+  h += `</tbody></table></div>`;
+  const extras = [];
+  if (r.M.trendPerYear !== null) extras.push(`den almindelige ugedag følger udviklingen over tid (${pctSigned(1 + r.M.trendPerYear)} om året)`);
+  if (Math.abs(r.M.level) >= 0.005) extras.push(`og er rettet ${Math.abs(Math.expm1(r.M.level) * 100).toFixed(0)} % ${r.M.level > 0 ? "op" : "ned"} efter de seneste 8 uger`);
+  if (extras.length) h += `<p class="note">${cap(extras.join(" "))}. Tallene her er ikke afrundet, så de kan afvige lidt fra søjlerne ovenfor.</p>`;
+  el.innerHTML = h;
+}
+function occPeak(F, OCC) {
+  let best = { v: -1 };
+  for (const d of F.days) { if (d.closed) continue; const r = OCC.share[wdOf(d.dn)]; for (let h = 0; h < 24; h++) { const v = r[h] * d.mid * OCC.factor(d.dn); if (v > best.v) best = { v, dn: d.dn, h }; } }
+  return best.v > 0 ? best : null;
+}
+function peakWindow(share) {
+  let best = -1, at = 0;
+  for (let h = 0; h <= 21; h++) { const s = share[h] + share[h + 1] + share[h + 2]; if (s > best) { best = s; at = h; } }
+  return best > 0 ? [at, at + 3] : null;
+}
+function analyse(kind, sp) {
+  const A = S.data[kind].get(S.branch); if (!A) return null;
+  const M = fit(A.daily, S.start, sp);
+  if (M.error) return { kind, A, M };
+  let lastYear = 0, lyFull = true; for (let k = 0; k < 7; k++) { const d = S.start + k - 364; if (!A.daily.has(d)) { lyFull = false; break; } lastYear += A.daily.get(d); }
+  let actual = 0, actFull = true; for (let k = 0; k < 7; k++) { const d = S.start + k; if (!A.daily.has(d)) { actFull = false; break; } actual += A.daily.get(d); }
+  return { kind, A, M, F: forecastWeek(M, S.start, sp), P: hourProfile(A, S.start), OCC: kind === "besoeg" ? occupancy(A, S.start) : null, BT: backtest(A.daily, S.start, sp), lastYear: lyFull ? lastYear : null, actual: actFull ? actual : null };
+}
+
+/* ---------- rendering ---------- */
+function warn(html, sticky) { const d = document.createElement("div"); d.className = "warn" + (sticky ? " sticky" : ""); d.innerHTML = html; $("warnings").appendChild(d); }
+function clearWarn() { $("warnings").querySelectorAll(".warn:not(.sticky)").forEach(e => e.remove()); }
+
+function rebuild() {
+  combine();
+  const names = branchNames();
+  renderDataInfo();
+  if (!names.length) {
+    $("result").classList.toggle("hidden", !S.files.length); $("controls").classList.add("hidden");
+    if (!S.files.length) $("drop").classList.add("show");
+    else warn("Jeg kunne ikke finde en dato- og en antal-kolonne i filerne. Åbn <b>Data og kolonner</b> nederst og ret kolonnerne, eller prøv en anden eksport.");
+    return;
+  }
+  $("drop").classList.remove("show");
+  const sel = $("branch");
+  sel.innerHTML = names.map(n => `<option>${esc(n)}</option>`).join("");
+  if (!names.includes(S.branch)) S.branch = names[0];
+  sel.value = S.branch;
+  $("controls").classList.remove("hidden");
+  if (S.start === null) { const t = todayDn(); S.start = t + (7 - wdOf(t)); }
+  $("start").value = iso(S.start);
+  const have = Object.keys(MEASURES).filter(k => S.data[k].size);
+  if (!have.includes(S.measure)) S.measure = have[0];
+  $("tabs").classList.toggle("hidden", have.length < 2);
+  render();
+}
+
+function render() {
+  clearWarn();
+  const sp = specialMap();
+  const R = {}; for (const k of Object.keys(MEASURES)) R[k] = S.data[k].size ? analyse(k, sp) : null;
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.m === S.measure ? "true" : "false"));
+  renderSpecial(); renderDataInfo();
+  $("result").classList.remove("hidden");
+  const r = R[S.measure], ms = MEASURES[S.measure];
+  const wk = isoWeek(S.start), end = S.start + 6;
+  $("subtitle").textContent = `${S.branch}, uge ${wk}: ${dShort(S.start)} til ${dLong(end)}`;
+  $("dayLead").textContent = ms.dayLead; $("heatLead").textContent = ms.heatLead;
+  const blank = () => { for (const id of ["heroLabel", "heroNum", "heroRange", "facts", "daysChart", "daysLegend", "heat", "trustChart", "howto"]) $(id).innerHTML = ""; $("trustCard").classList.add("hidden"); $("hourCard").classList.add("hidden"); };
+  if (!r) { blank(); warn(`Der er ingen ${ms.source} for ${esc(S.branch)}. Vælg et andet bibliotek.`); }
+  else if (r.M.error) { blank(); warn(`Der er kun ${r.M.n} dage med ${ms.source} før ${dLong(S.start)}. Prognosen kræver mindst 4 uger, og den bliver først god med et helt år eller mere.`); }
+  else renderMeasure(r, sp);
+  $("brief").value = briefText(R, sp);
+  $("brief").style.height = "auto"; $("brief").style.height = ($("brief").scrollHeight + 4) + "px";
+}
+
+function renderMeasure(r, sp) {
+  const { M, F, P, BT, A } = r, ms = MEASURES[r.kind], wk = isoWeek(S.start);
+  const gap = Math.floor((S.start - M.last) / 7);
+  const bld = inBuilding(r);
+  $("viewMode").classList.toggle("hidden", !(r.kind === "besoeg" && r.OCC));
+  document.querySelectorAll("#viewMode button").forEach(b => b.setAttribute("aria-selected", (b.dataset.v === "bygning") === bld ? "true" : "false"));
+  if (bld) {
+    const pk = viewDays(r).filter(d => !d.closed).reduce((a, b) => b.mid > a.mid ? b : a);
+    $("heroLabel").textContent = `Flest i bygningen på én gang i uge ${wk}`;
+    $("heroNum").textContent = fmt(pk.mid);
+    $("heroRange").textContent = `${cap(WD[wdOf(pk.dn)])}: sandsynligvis mellem ${fmt(pk.lo)} og ${fmt(pk.hi)} personer`;
+    $("dayLead").textContent = "Flest i bygningen på én gang pr. dag (i dagens travleste time). Det er det tal, pladsen og bemandingen skal kunne klare. Stregen viser det sandsynlige spænd.";
+  } else {
+    $("heroLabel").textContent = r.kind === "besoeg" ? `Forventet entré i uge ${wk}` : `Forventede ${ms.noun} i uge ${wk}`;
+    $("heroNum").textContent = fmt(F.mid);
+    $("heroRange").textContent = `Sandsynligvis mellem ${fmt(F.lo)} og ${fmt(F.hi)}` + (r.kind === "besoeg" ? " (gange nogen går ind ad døren)" : "");
+  }
+  const open = F.days.filter(d => !d.closed);
+  const facts = [];
+  if (open.length) {
+    const busiest = open.reduce((a, b) => b.mid > a.mid ? b : a), quietest = open.reduce((a, b) => b.mid < a.mid ? b : a);
+    const peak = P ? peakWindow(P[wdOf(busiest.dn)]) : null;
+    facts.push([`Travlest: ${WD[wdOf(busiest.dn)]} ${dShort(busiest.dn)}`, `ca. ${fmt(busiest.mid)} ${ms.noun}${peak ? `, mest kl. ${peak[0]}–${peak[1]}` : ""}`]);
+    facts.push([`Roligst: ${WD[wdOf(quietest.dn)]} ${dShort(quietest.dn)}`, `ca. ${fmt(quietest.mid)} ${ms.noun}`]);
+  }
+  if (r.lastYear) { const ch = (F.mid / r.lastYear - 1) * 100; facts.push([`Samme uge sidste år: ${fmt(r.lastYear)}`, `prognosen er ${ch >= 0 ? "+" : "−"}${Math.abs(ch).toFixed(0)} % i forhold til det`]); }
+  if (r.actual !== null) facts.push([`Faktisk: ${nf.format(Math.round(r.actual))}`, `ugen ligger i data, så prognosen kan tjekkes`]);
+  const wf = weatherFact(M, F);
+  if (wf) facts.push(wf);
+  if (r.OCC) { const pk = occPeak(F, r.OCC); if (pk) facts.push([`Flest i bygningen: ${WD[wdOf(pk.dn)]} kl. ${pk.h}–${pk.h + 1}`, `ca. ${fmt(pk.v)} personer ad gangen; et besøg varer typisk ${Math.round(r.OCC.stay)} min`]); }
+  { const wet = F.days.filter(d => (WX.rain.get(d.dn) || 0) >= 5 && !d.closed);
+    if (wet.length && (M.rainEff !== null || M.rainWeEff !== null || (r.OCC && r.OCC.rainWork !== null))) {
+      const w = wet.reduce((a, b) => WX.rain.get(b.dn) > WX.rain.get(a.dn) ? b : a), parts = [];
+      if (isBreak(w.dn) && M.rainEff !== null) parts.push(`det er skoleferie, så regnen giver ${pctTxt(Math.expm1(M.rainEff * rainOf(w.dn)), "flere", "færre")} ${MEASURES[r.kind].noun}`);
+      else if (isWeekendOff(w.dn) && M.rainWeEff !== null) parts.push(`det er ${wdOf(w.dn) >= 5 ? "weekend" : "en helligdag"}, så regnen giver ${pctTxt(Math.expm1(M.rainWeEff * rainOf(w.dn)), "flere", "færre")} ${MEASURES[r.kind].noun}`);
+      else if (M.rainEff !== null || M.rainWeEff !== null) parts.push(`på en almindelig hverdag ændrer regn ikke antallet, der kommer`);
+      if (r.OCC && r.OCC.rainWork !== null) parts.push(`folk bliver ${pctTxt(Math.exp((isFree(w.dn) ? Math.log1p(r.OCC.rainFree) : Math.log1p(r.OCC.rainWork)) * rainOf(w.dn) / Math.log1p(10)) - 1, "længere", "kortere")} i bygningen`);
+      facts.push([`Regn: ${WD[wdOf(w.dn)]} ca. ${Math.round(WX.rain.get(w.dn))} mm`, parts.join("; ")]); } }
+  if (BT) facts.push([`Ramte ved siden af med ca. ${(BT.weekErr * 100).toFixed(0)} % pr. uge`, `målt på de seneste ${BT.nWeeks} uger med data`]);
+  $("facts").innerHTML = facts.map(([b, s]) => `<div class="fact"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+  if (M.last - M.first < 330) warn(`Der er kun ${ms.source} for ${Math.round((M.last - M.first + 1) / 7)} uger (${dLong(M.first)} til ${dLong(M.last)}). Prognosen kender ugedagene, men ikke årstiderne og ferierne endnu. Med et helt år eller mere bliver den meget bedre.`);
+  if (gap >= 2) warn(`Seneste ${ms.source} er fra ${dLong(M.last)}, ${gap} uger før den valgte uge. Prognosen bygger på faste mønstre (ugedag, årstid, ferier), så den virker stadig, men nyere data gør den skarpere.`);
+  const unknownTypes = [...new Set(F.days.map(d => sp.get(d.dn)).filter(s => s && s.type !== "lukket" && !M.extra[s.type]).map(s => s.type))];
+  if (unknownTypes.length) warn(`Der er ${unknownTypes.map(t => t === "valg" ? "et valg" : "et arrangement").join(" og ")} i ugen, men ingen tidligere dage af den type i data. Derfor kan modellen ikke vide, hvor meget det betyder, og prognosen tager ikke højde for det. Tilføj tidligere ${unknownTypes.includes("valg") ? "valg" : "arrangementer"} under <b>Særlige dage</b>, så lærer den det.`);
+
+  renderDays(r, sp);
+  renderWhy(r, sp);
+  renderHeat(F, P, r.OCC);
+  renderTrust(BT);
+  renderHowto(M, ms);
+}
+
+const pctTxt = (x, more, less) => `ca. ${Math.abs(x * 100).toFixed(0)} % ${x >= 0 ? more : less}`;
+function weatherFact(M, F) {
+  if (!M.spec.wx) return null;
+  const known = F.days.filter(d => WX.tmax.has(d.dn));
+  if (!known.length) return ["Vejret: ingen prognose for ugen", "vejrprognosen rækker kun ca. 2 uger frem, så ugen er regnet som normal for årstiden"];
+  const odd = known.reduce((a, b) => Math.abs(tempAnom(b.dn)) > Math.abs(tempAnom(a.dn)) ? b : a), an = tempAnom(odd.dn);
+  if (Math.abs(an) < 3) return ["Vejret: normalt for årstiden", `ingen dage mere end 3 °C fra det normale (${Math.round(Math.min(...known.map(d => WX.tmax.get(d.dn))))} til ${Math.round(Math.max(...known.map(d => WX.tmax.get(d.dn))))} °C)`];
+  const eff = Math.expm1(an > 0 ? M.wxEff.hot * hotOf(odd.dn) : M.wxEff.cold * coldOf(odd.dn));
+  return [`Vejret: ${WD[wdOf(odd.dn)]} er ${Math.round(Math.abs(an))} °C ${an > 0 ? "varmere" : "koldere"} end normalt`, `${Math.round(WX.tmax.get(odd.dn))} °C; det giver ${pctTxt(eff, "flere", "færre")} den dag, og det er regnet med`];
+}
+
+function renderDays(r, sp) {
+  const VD = viewDays(r), ly = S.ly && VD.some(d => d.lastYear !== undefined);
+  const unit = inBuilding(r) ? "personer ad gangen" : MEASURES[r.kind].noun, N = v => nf.format(Math.round(v));
+  const W = 760, H = 300, pl = 8, pr = 8, pt = 14, pb = 66, n = 7, gw = (W - pl - pr) / n, bw = Math.min(64, gw * 0.56);
+  const max = Math.max(...VD.map(d => Math.max(d.hi, d.actual || 0, ly ? d.lastYear || 0 : 0)), 1) * 1.05;
+  const y = v => pt + (H - pt - pb) * (1 - v / max), y0 = y(0);
+  const tip = (...lines) => `data-tip="${esc(lines.filter(Boolean).join("\n"))}"`;
+  const hit = (cx, cy, t) => `<circle class="hit" cx="${cx}" cy="${cy}" r="11" ${t}/>`;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Prognose dag for dag">`, top = "";
+  for (let g = 1; g <= 3; g++) { const v = max / 1.05 * g / 3; s += `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-dasharray="2 4"/>`; }
+  s += `<line x1="${pl}" x2="${W - pr}" y1="${y0}" y2="${y0}" stroke="var(--ink3, var(--muted))"/>`;
+  let anyActual = false; const busiest = Math.max(...VD.filter(d => !d.closed).map(d => d.mid));
+  VD.forEach((d, i) => {
+    const cx = pl + gw * i + gw / 2, spd = sp.get(d.dn), hol = holidayName(d.dn), day = `${WD[wdOf(d.dn)][0].toUpperCase() + WD[wdOf(d.dn)].slice(1)} ${dShort(d.dn)}`;
+    const fill = spd && spd.type !== "lukket" ? "var(--warm)" : d.mid === busiest ? "var(--accent)" : "var(--bar)";
+    const diff = d.actual !== undefined && d.mid > 0 ? (d.actual - d.mid) / d.mid : null;
+    const lyTxt = d.lastYear !== undefined ? `Samme ugedag sidste år (${dShort(d.dn - 364)} ${ymd(d.dn - 364)[0]}): ${N(d.lastYear)}` : "";
+    // whole column: a summary of the day
+    s += `<rect class="col" x="${pl + gw * i}" y="${pt}" width="${gw}" height="${y0 - pt}" ${tip(day, d.closed ? "Lukket" : `Prognose: ${N(d.mid)} ${unit}`, d.closed ? "" : `Sandsynligt spænd: ${N(d.lo)} til ${N(d.hi)}`, d.actual !== undefined ? `Faktisk: ${N(d.actual)}${diff !== null ? ` (${diff >= 0 ? "+" : "−"}${Math.abs(diff * 100).toFixed(0)} %)` : ""}` : "", lyTxt, spd ? spd.navn : hol)}/>`;
+    if (!d.closed) {
+      s += `<rect x="${cx - bw / 2}" y="${y(d.mid)}" width="${bw}" height="${y0 - y(d.mid)}" fill="${fill}" pointer-events="none"/>`;
+      s += `<path d="M${cx},${y(d.hi)}V${y(d.lo)}M${cx - 5},${y(d.hi)}h10M${cx - 5},${y(d.lo)}h10" stroke="var(--ink)" stroke-width="1.2" opacity=".5" fill="none" pointer-events="none"/>`;
+      top += hit(cx, y(d.hi), tip(`Øvre ende af spændet: ${N(d.hi)}`, `${day}. 8 ud af 10 dage lander mellem ${N(d.lo)} og ${N(d.hi)}.`));
+      top += hit(cx, y(d.lo), tip(`Nedre ende af spændet: ${N(d.lo)}`, `${day}. 8 ud af 10 dage lander mellem ${N(d.lo)} og ${N(d.hi)}.`));
+      top += `<rect class="hit bartop" x="${cx - bw / 2 - 2}" y="${y(d.mid) - 5}" width="${bw + 4}" height="10" ${tip(`Prognose: ${N(d.mid)} ${unit}`)}/>`;
+      s += `<text x="${cx}" y="${y0 + 21}" text-anchor="middle" style="fill:var(--ink);font-weight:700;font-size:15px">${fmt(d.mid)}</text>`;
+    } else s += `<text x="${cx}" y="${y0 + 21}" text-anchor="middle" style="fill:var(--muted);font-weight:600">Lukket</text>`;
+    if (ly && d.lastYear !== undefined) {
+      s += `<line x1="${cx - bw / 2 - 5}" x2="${cx + bw / 2 + 5}" y1="${y(d.lastYear)}" y2="${y(d.lastYear)}" stroke="var(--warm)" stroke-width="2" stroke-dasharray="5 3" pointer-events="none"/>`;
+      top += `<rect class="hit" x="${cx - bw / 2 - 5}" y="${y(d.lastYear) - 6}" width="${bw + 10}" height="12" ${tip(lyTxt, day)}/>`;
+    }
+    if (d.actual !== undefined) {
+      anyActual = true;
+      top += `<circle cx="${cx}" cy="${y(d.actual)}" r="5" fill="var(--ink)" stroke="var(--card)" stroke-width="2" pointer-events="none"/>`;
+      top += hit(cx, y(d.actual), tip(`Faktisk: ${N(d.actual)} ${unit}`, `${day}${diff !== null ? `, ${diff >= 0 ? "+" : "−"}${Math.abs(diff * 100).toFixed(0)} % ift. prognosen (${N(d.mid)})` : ""}`));
+    }
+    s += `<text x="${cx}" y="${y0 + 39}" text-anchor="middle">${WDS[wdOf(d.dn)]} ${dShort(d.dn)}</text>`;
+    const tag = spd ? spd.navn : hol;
+    if (tag) s += `<text x="${cx}" y="${y0 + 55}" text-anchor="middle" style="fill:var(--warm);font-size:11px">${esc(tag.length > 18 ? tag.slice(0, 17) + "…" : tag)}</text>`;
+  });
+  s += top + `</svg><div class="tip" hidden></div>`;
+  $("daysChart").innerHTML = s;
+  const lyTot = VD.every(d => d.lastYear !== undefined) ? VD.reduce((a, d) => a + d.lastYear, 0) : null;
+  $("daysLegend").innerHTML = `<span><i style="background:var(--bar)"></i>Prognose</span><span><i style="background:var(--accent)"></i>Travleste dag</span><span><i style="background:none;border-left:1.5px solid var(--muted);height:12px;width:1px;margin:0 7px"></i>Sandsynligt spænd</span>` +
+    (VD.some(d => { const t = (sp.get(d.dn) || {}).type; return t && t !== "lukket"; }) ? `<span><i style="background:var(--warm)"></i>Særlig dag</span>` : "") +
+    (ly ? `<span><i style="background:none;border-top:2px dashed var(--warm);height:0;width:18px"></i>Samme ugedag sidste år (${dShort(VD[0].dn - 364)} til ${dShort(VD[6].dn - 364)} ${ymd(VD[6].dn - 364)[0]})${lyTot !== null && !inBuilding(r) ? `, i alt ${fmt(lyTot)}` : ""}</span>` : "") +
+    (S.ly && !ly ? `<span>Ingen data for samme uge sidste år</span>` : "") +
+    (anyActual ? `<span><i style="background:var(--ink);border-radius:50%;width:10px;height:10px"></i>Faktisk antal (ugen ligger i data)</span>` : "") + `<span style="margin-left:auto">Hold musen over søjler og punkter for tallene</span>`;
+}
+
+function renderHeat(F, P, OCC) {
+  if (!P) { $("hourCard").classList.add("hidden"); return; }
+  $("hourCard").classList.remove("hidden");
+  const inHouse = !!OCC && S.view === "bygning";
+  if (inHouse) $("heatLead").textContent = `Forventet antal personer i bygningen, i gennemsnit i timen. Det er det tal, bemandingen skal passe til. Folk bliver typisk ${Math.round(OCC.stay)} min` +
+    (OCC.hot !== null ? `, og på dage 10 °C varmere end normalt bliver de ${pctTxt(OCC.hot, "længere", "kortere")} tid.` : ".") +
+    (OCC.rainWork !== null ? ` Ved 10 mm regn bliver de ${pctTxt(OCC.rainWork, "længere", "kortere")} på hverdage og ${pctTxt(OCC.rainFree, "længere", "kortere")} på fridage.` : "");
+  const hours = []; for (let h = 0; h < 24; h++) if (Math.max(...P.map(r => r[h])) >= 0.01) hours.push(h);
+  const vals = F.days.map(d => inHouse ? OCC.share[wdOf(d.dn)].map(s => s * d.mid * OCC.factor(d.dn)) : P[wdOf(d.dn)].map(s => s * d.mid));
+  const max = Math.max(...vals.flat(), 1);
+  let t = `<table><thead><tr><th class="row"></th>${hours.map(h => `<th>${String(h).padStart(2, "0")}</th>`).join("")}</tr></thead><tbody>`;
+  F.days.forEach((d, i) => {
+    t += `<tr><th class="row">${WDS[wdOf(d.dn)]} ${dShort(d.dn)}</th>`;
+    for (const h of hours) {
+      const v = vals[i][h], a = v / max;
+      t += `<td style="background:color-mix(in srgb, var(--accent) ${Math.round(a * 85)}%, var(--card));${a > 0.55 ? "color:#fff;font-weight:600" : ""}" title="${WD[wdOf(d.dn)]} kl. ${h}–${h + 1}: ca. ${fmt(v)}">${v >= 0.5 ? fmt(v) : ""}</td>`;
+    }
+    t += `</tr>`;
+  });
+  t += `</tbody></table><p class="note">${inHouse ? "Beregnet ud fra tællernes ind og ud: hvor mange der er kommet ind og endnu ikke gået. Tællerne tæller ikke helt ens ind og ud, så ud-tallet er skaleret, så huset er tomt ved lukketid. Mønstret er fra de seneste 12 måneder." : "Ugens prognose fordelt efter, hvordan dagen plejer at fordele sig over timerne (de seneste 12 måneder)."} Timer med næsten ingenting er udeladt.</p>`;
+  $("heat").innerHTML = t;
+}
+
+function renderTrust(BT) {
+  if (!BT) { $("trustCard").classList.add("hidden"); return; }
+  $("trustCard").classList.remove("hidden");
+  $("trustLead").textContent = `Her har modellen kun fået data frem til ${dLong(BT.from)} og skullet gætte de ${BT.nWeeks} uger efter. Den ramte i gennemsnit ${(BT.weekErr * 100).toFixed(0)} % ved siden af pr. uge` +
+    (BT.naiveErr !== null ? `. Til sammenligning: "samme uge sidste år" ramte ${(BT.naiveErr * 100).toFixed(0)} % ved siden af.` : ".");
+  const pts = BT.pts, W = 760, H = 240, pl = 48, pr = 8, pt = 10, pb = 28;
+  const raw = Math.max(...pts.map(p => Math.max(p.hi, p.y || 0)), 1) / 4, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(v => v >= raw), max = step * 4;
+  const x = i => pl + (W - pl - pr) * i / Math.max(1, pts.length - 1), y = v => pt + (H - pt - pb) * (1 - v / max);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Prognose mod faktisk">`;
+  for (let g = 0; g <= 4; g++) { const v = step * g; s += `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${pl - 6}" y="${y(v) + 4}" text-anchor="end">${nf.format(v)}</text>`; }
+  s += `<path d="M${pts.map((p, i) => `${x(i)},${y(p.hi)}`).join("L")}L${pts.map((p, i) => `${x(i)},${y(p.lo)}`).reverse().join("L")}Z" fill="var(--accent-soft)"/>`;
+  s += `<path d="M${pts.map((p, i) => `${x(i)},${y(p.p)}`).join("L")}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
+  let d = "", pen = false;
+  pts.forEach((p, i) => { if (p.y === null) { pen = false; return; } d += `${pen ? "L" : "M"}${x(i)},${y(p.y)}`; pen = true; });
+  s += `<path d="${d}" fill="none" stroke="var(--ink)" stroke-width="1.6"/>`;
+  pts.forEach((p, i) => { if (wdOf(p.dn) === 0) s += `<text x="${x(i)}" y="${H - 8}" text-anchor="start">${dShort(p.dn)}</text>`; });
+  s += `</svg>`;
+  $("trustChart").innerHTML = s;
+}
+
+function briefText(R, sp) {
+  const ok = Object.keys(MEASURES).filter(k => R[k] && !R[k].M.error);
+  if (!ok.length) return "";
+  const wk = isoWeek(S.start), L = [];
+  L.push(`Prognose for ${S.branch}, uge ${wk} (${dShort(S.start)} til ${dLong(S.start + 6)})`);
+  L.push("");
+  for (const k of ok) {
+    const r = R[k], ms = MEASURES[k];
+    L.push(`${k === "besoeg" ? "Besøgende (entré)" : ms.label}: ca. ${fmt(r.F.mid)} i alt, sandsynligvis mellem ${fmt(r.F.lo)} og ${fmt(r.F.hi)}.` + (r.lastYear ? ` Samme uge sidste år: ${fmt(r.lastYear)}.` : ""));
+  }
+  L.push("");
+  L.push(`Dag for dag${` (${ok.map(k => k === "besoeg" ? "entré" : MEASURES[k].noun).join(" / ")})`}:`);
+  for (let i = 0; i < 7; i++) {
+    const dn = S.start + i, s = sp.get(dn), hol = holidayName(dn), tag = s ? ` (${s.navn})` : hol ? ` (${hol})` : "";
+    const vals = ok.map(k => { const d = R[k].F.days[i]; return d.closed ? "lukket" : `ca. ${fmt(d.mid)}`; });
+    L.push(`- ${cap(WD[wdOf(dn)])} ${dShort(dn)}: ${vals.join(" / ")}${tag}`);
+  }
+  L.push("");
+  // what is out of the ordinary this week: holidays, breaks, weather and special days that move a day by 8 % or more
+  const odd = [], perDay = [];
+  for (let i = 0; i < 7; i++) {
+    const dn = S.start + i, items = new Map(), add = (lab, txt) => { if (!items.has(lab)) items.set(lab, []); items.get(lab).push(txt); };
+    perDay.push(items);
+    for (const k of ok) {
+      const r = R[k]; if (r.F.days[i].closed) continue;
+      const c = contrib(r.M, dn, sp), noun = k === "besoeg" ? "entré" : MEASURES[k].noun;
+      if (c.ferieLabel && Math.abs(c.ferie - 1) >= 0.08) add(c.ferieLabel, `${pctSigned(c.ferie)} ${noun}`);
+      if (c.vejrLabel && Math.abs(c.vejr - 1) >= 0.08) add(c.vejrLabel, `${pctSigned(c.vejr)} ${noun}`);
+      if (c.extra && Math.abs(c.extra) >= 0.08 * Math.max(1, c.mid - c.extra)) add(c.extraLabel, `${c.extra > 0 ? "+" : "−"}${fmt(Math.abs(c.extra))} ${noun}`);
+    }
+  }
+  // an effect that is the same on every open day (a school break) is said once for the whole week
+  const openDays = perDay.filter((_, i) => ok.some(k => !R[k].F.days[i].closed));
+  const whole = new Map();
+  for (const [l, t] of perDay.find(m => m.size) || []) { const key = t.join(", "); if (openDays.length >= 5 && openDays.every(m => m.has(l) && m.get(l).join(", ") === key)) whole.set(l, key); }
+  for (const [l, t] of whole) odd.push(`- Hele ugen: ${l} (${t}).`);
+  perDay.forEach((items, i) => {
+    const rest = [...items].filter(([l]) => !whole.has(l));
+    if (rest.length) odd.push(`- ${cap(WD[wdOf(S.start + i)])} ${dShort(S.start + i)}: ` + rest.map(([l, t]) => `${l} (${t.join(", ")})`).join("; ") + ".");
+  });
+  if (odd.length) { L.push("Det særlige ved ugen:"); for (const o of odd) L.push(o); L.push(""); }
+  for (const k of ok) {
+    const r = R[k], ms = MEASURES[k], open = r.F.days.filter(d => !d.closed); if (!open.length) continue;
+    const b = open.reduce((a, c) => c.mid > a.mid ? c : a);
+    const pk = r.P ? peakWindow(r.P[wdOf(b.dn)]) : null;
+    let line = `${ms.label}: travlest ${WD[wdOf(b.dn)]}${pk ? `, især kl. ${pk[0]}–${pk[1]}` : ""}.`;
+    if (r.P) { const wkPk = peakWindow([0, 1, 2, 3, 4].map(w => r.P[w]).reduce((acc, row) => acc.map((v, h) => v + row[h]), new Array(24).fill(0))); if (wkPk) line += ` På hverdage flest kl. ${wkPk[0]}–${wkPk[1]}.`; }
+    L.push(line);
+    if (r.OCC) { const pk = occPeak(r.F, r.OCC); if (pk) L.push(`Flest i bygningen på én gang: ${WD[wdOf(pk.dn)]} kl. ${pk.h}–${pk.h + 1}, ca. ${fmt(pk.v)} personer.`); }
+    for (const t of EXTRA_TYPES) {
+      const e = r.M.extra[t];
+      if (e && r.F.days.some(d => (sp.get(d.dn) || {}).type === t))
+        L.push(`${t === "valg" ? "Valgdage" : "Arrangementer"} har tidligere givet ca. ${fmt(Math.abs(e.mean))} ${e.mean >= 0 ? "flere" : "færre"} ${ms.noun} end en almindelig dag (${e.days.length} ${e.days.length === 1 ? "gang" : "gange"} i data), og det er regnet med.`);
+    }
+  }
+  L.push("");
+  L.push("Grundlag: " + ok.map(k => `${MEASURES[k].source} fra ${dLong(R[k].M.first)} til ${dLong(R[k].M.last)}`).join("; ") + ".");
+  const bt = ok.filter(k => R[k].BT);
+  if (bt.length) L.push(`Over de seneste uger med data ramte metoden i gennemsnit ${bt.map(k => `${(R[k].BT.weekErr * 100).toFixed(0)} % ved siden af pr. uge for ${MEASURES[k].noun}`).join(" og ")}.`);
+  return L.join("\n");
+}
+
+function renderHowto(M, ms) {
+  const parts = [];
+  parts.push(`<p>Prognosen er en <b>regressionsmodel</b> på antal ${ms.noun} pr. dag. Den lærer af jeres egne data, hvor meget hver af disse ting betyder:</p><ul>`);
+  parts.push(`<li><b>Ugedag</b>: lørdag er ikke som tirsdag.</li>`);
+  if (M.spec.K) parts.push(`<li><b>Årstid</b>: en jævn kurve over året.</li>`);
+  const fl = { hol: "helligdage", jul: "juleferie", paaske: "påskeferie", vinter: "vinterferie", efteraar: "efterårsferie", sommer: "sommerferie" };
+  if (M.spec.flags.length) parts.push(`<li><b>Særlige perioder</b>: ${M.spec.flags.map(f => fl[f]).join(", ")}.</li>`);
+  if (M.spec.trend) parts.push(`<li><b>Udvikling over tid</b>: om tallet langsomt stiger eller falder.</li>`);
+  if (M.spec.wx) parts.push(`<li><b>Vejret</b>: dage, der er mere end 3 °C varmere eller koldere end normalt for årstiden. Varme og kulde har hver sit tal, lært af jeres egne data: 10 °C ekstra varme giver ${pctTxt(Math.expm1(M.wxEff.hot), "flere", "færre")} ${ms.noun}, 10 °C ekstra kulde ${pctTxt(Math.expm1(M.wxEff.cold), "flere", "færre")}. </li>`);
+  if (M.rainEff !== null || M.rainWeEff !== null) parts.push(`<li><b>Regn på fridage</b>: når folk har fri, kan regn trække dem ind eller holde dem hjemme. Skoleferier og weekender (med helligdage) har hver sit tal, lært af jeres egne data: 10 mm regn giver ${[M.rainEff !== null ? `${pctTxt(Math.expm1(M.rainEff * Math.log1p(10)), "flere", "færre")} ${ms.noun} på en skoleferiedag` : "", M.rainWeEff !== null ? `${pctTxt(Math.expm1(M.rainWeEff * Math.log1p(10)), "flere", "færre")} i en weekend uden for ferierne` : ""].filter(Boolean).join(" og ")}. På almindelige hverdage ændrer regn ikke meget på antallet, men den påvirker, hvor længe folk bliver.</li>`);
+  parts.push(`<li><b>De seneste uger</b>: nyere data vejer mere end gamle (data fra et år siden tæller det halve), og niveauet rettes til de seneste 8 uger (den typiske afvigelse, så enkelte skæve dage ikke trækker det hele med). Lige nu ligger de ${Math.abs(Math.expm1(M.level) * 100).toFixed(0)} % ${M.level >= 0 ? "over" : "under"} det, resten af modellen ville forvente, og det er regnet med. Tricket er lånt fra eksponentiel udglatning, metoden bag Excels PROGNOSE.ETS.</li>`);
+  for (const t of EXTRA_TYPES) if (M.extra[t]) parts.push(`<li><b>${t === "valg" ? "Valgdage" : "Arrangementer"}</b>: regnet som et antal ekstra ${ms.noun} oven i en almindelig dag, gennemsnittet af tidligere dage af samme type. I data: ${M.extra[t].days.map(x => `${dShort(x.dn)} ${ymd(x.dn)[0]} (${x.extra >= 0 ? "+" : "−"}${fmt(Math.abs(x.extra))})`).join(", ")}.</li>`);
+  parts.push(`</ul><p>Den regner på logaritmen af antallet, så ugedage, årstider og ferier virker i procent ("vinterferie giver 12 % færre"). Spændet kommer fra, hvor meget modellen tidligere har ramt ved siden af. Den bruger kun data fra før den valgte uge, så du kan vælge en uge, der allerede er gået, og se, hvordan den ville have klaret sig.</p>`);
+  const off = M.dropped.filter(d => !d.special);
+  parts.push(`<p>Modellen er bygget på ${nf.format(M.keep.length)} almindelige dage.` + (off.length ? ` ${off.length} ${off.length === 1 ? "dag er" : "dage er"} sorteret fra (${[...new Set(off.map(d => d.why))].join(", ")}): ${off.slice(0, 8).map(d => dShort(d.dn) + " " + ymd(d.dn)[0]).join(", ")}${off.length > 8 ? " …" : ""}.` : "") + `</p>`);
+  const coefs = M.spec.flags.map(f => [fl[f], M.coef(f)]).filter(([, c]) => c !== null);
+  if (coefs.length) parts.push(`<p class="note">Hvad modellen har lært: ${coefs.map(([n, c]) => `${n} ${c >= 0 ? "+" : "−"}${Math.abs(Math.round((Math.exp(c) - 1) * 100))} %`).join(" · ")}</p>`);
+  $("howto").innerHTML = parts.join("");
+}
+
+function renderDataInfo() {
+  const cols = ["date", "hour", "count", "branch", "out"], lbl = { date: "Dato", hour: "Time", count: "Antal (ind)", branch: "Bibliotek", out: "Ud (valgfri)" };
+  let h = `<p class="note">Type og kolonner er gættet automatisk. Ret dem, hvis gættet er forkert.</p><div class="heat"><table class="map"><thead><tr><th>Fil</th><th>Type</th>${cols.map(c => `<th>${lbl[c]}</th>`).join("")}<th>Periode</th></tr></thead><tbody>`;
+  S.files.forEach((f, fi) => {
+    const head = f.headerRow || [];
+    h += `<tr><td>${esc(f.name)}</td><td><select data-f="${fi}" data-c="kind">${Object.entries(MEASURES).map(([k, m]) => `<option value="${k}" ${f.kind === k ? "selected" : ""}>${m.label}</option>`).join("")}</select></td>`;
+    for (const c of cols) h += `<td><select data-f="${fi}" data-c="${c}"><option value="">(ingen)</option>${head.map((x, i) => `<option value="${i}" ${f.map && f.map[c] === i ? "selected" : ""}>${esc(x == null ? "kolonne " + (i + 1) : x)}</option>`).join("")}</select></td>`;
+    h += `<td>${f.first !== null && f.first !== undefined ? `${dShort(f.first)} ${ymd(f.first)[0]} til ${dShort(f.last)} ${ymd(f.last)[0]}` : "<span class='muted'>ingen rækker læst</span>"}</td></tr>`;
+  });
+  h += `</tbody></table></div>`;
+  $("dataInfo").innerHTML = h;
+  $("dataInfo").querySelectorAll("select").forEach(el => el.addEventListener("change", async () => {
+    const f = S.files[+el.dataset.f];
+    if (el.dataset.c === "kind") { f.kind = el.value; f.forced = true; rebuild(); return; }
+    f.map[el.dataset.c] = el.value === "" ? null : +el.value; f.forced = true;
+    busy(true, `Læser ${f.name} igen…`); await tick(); await processFile(f); rebuild(); busy(false);
+  }));
+}
+
+function renderSpecial() {
+  const list = [...S.special].sort((a, b) => b.dato.localeCompare(a.dato));
+  const typeName = { valg: "Valg", arrangement: "Arrangement", lukket: "Lukket" };
+  $("specialList").innerHTML = list.map(s => `<li><span class="d">${esc(s.dato)}</span><span class="n">${esc(s.navn)}</span><span class="pill ${s.type}">${typeName[s.type] || esc(s.type)}</span><button class="ghost small x" data-k="${esc(s.dato)}|${esc(s.navn)}" type="button" aria-label="Fjern">Fjern</button></li>`).join("");
+  $("specialList").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    const [d, n] = b.dataset.k.split("|"); S.special = S.special.filter(s => !(s.dato === d && s.navn === n)); render();
+  }));
+}
+
+/* ---------- events ---------- */
+$("branch").addEventListener("change", e => { S.branch = e.target.value; render(); });
+{ const box = $("daysChart"), show = e => {
+    const t = e.target.closest && e.target.closest("[data-tip]"), tp = box.querySelector(".tip"); if (!tp) return;
+    if (!t) { tp.hidden = true; return; }
+    const [h, ...rest] = t.getAttribute("data-tip").split("\n");
+    tp.innerHTML = `<b>${esc(h)}</b>${rest.length ? "\n" + rest.map(esc).join("\n") : ""}`; tp.hidden = false;
+    const R = box.getBoundingClientRect(), w = tp.offsetWidth, hh = tp.offsetHeight;
+    let x = e.clientX - R.left + 14, yy = e.clientY - R.top - hh - 10;
+    if (x + w > R.width) x = e.clientX - R.left - w - 14; if (yy < 0) yy = e.clientY - R.top + 18;
+    tp.style.left = x + "px"; tp.style.top = yy + "px"; };
+  box.addEventListener("mousemove", show); box.addEventListener("click", show);
+  box.addEventListener("mouseleave", () => { const tp = box.querySelector(".tip"); if (tp) tp.hidden = true; }); }
+$("start").addEventListener("change", e => { const d = fromIso(e.target.value); if (d !== null) { S.start = d - wdOf(d); $("start").value = iso(S.start); render(); } });
+document.querySelectorAll("#tabs button").forEach(b => b.addEventListener("click", () => { S.measure = b.dataset.m; render(); }));
+document.querySelectorAll("#viewMode button").forEach(b => b.addEventListener("click", () => { S.view = b.dataset.v; render(); }));
+document.querySelectorAll("#dayCtl button").forEach(b => b.addEventListener("click", () => { S[b.dataset.t] = !S[b.dataset.t]; b.setAttribute("aria-pressed", S[b.dataset.t] ? "true" : "false"); render(); }));
+$("spAdd").addEventListener("click", () => {
+  const d = $("spDate").value, n = $("spName").value.trim() || ($("spType").value === "valg" ? "Valg" : $("spType").value === "lukket" ? "Lukket" : "Arrangement");
+  if (!d) return; S.special = S.special.filter(s => s.dato !== d).concat([{ dato: d, navn: n, type: $("spType").value }]); $("spName").value = ""; render();
+});
+for (const [id, key] of [["setWinter", "vinterferieUge"], ["setAutumn", "efteraarsferieUge"], ["setSumFrom", "sommerferieFra"], ["setSumTo", "sommerferieTil"]]) {
+  $(id).addEventListener("change", e => { S.settings[key] = +e.target.value; if (S.files.length) render(); });
+}
+$("copy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("brief").value); } catch (e) { $("brief").select(); document.execCommand("copy"); }
+  $("copied").textContent = "Kopieret."; setTimeout(() => $("copied").textContent = "", 2500);
+});
+const openPicker = () => $("fileInput").click();
+$("pick").addEventListener("click", openPicker);
+$("addFiles").addEventListener("click", openPicker);
+async function takeFiles(list) {
+  const src = [];
+  for (const f of list) { const buf = new Uint8Array(await f.arrayBuffer()); src.push({ name: f.name, bytes: () => buf }); }
+  if (src.length) loadSources(src);
+}
+$("fileInput").addEventListener("change", e => takeFiles(e.target.files));
+window.addEventListener("dragover", e => { e.preventDefault(); $("drop").classList.add("show"); });
+window.addEventListener("dragleave", e => { if (e.relatedTarget === null && S.files.length) $("drop").classList.remove("show"); });
+window.addEventListener("drop", e => { e.preventDefault(); takeFiles(e.dataTransfer.files); });
+
+/* ---------- start ---------- */
+(function init() {
+  const cfg = window.PROGNOSE_INDSTILLINGER || {};
+  for (const k of Object.keys(S.settings)) if (cfg[k] != null) S.settings[k] = +cfg[k];
+  $("setWinter").value = S.settings.vinterferieUge; $("setAutumn").value = S.settings.efteraarsferieUge;
+  $("setSumFrom").value = S.settings.sommerferieFra; $("setSumTo").value = S.settings.sommerferieTil;
+  if (cfg.bibliotek) S.branch = String(cfg.bibliotek);
+  if (cfg.start) { const d = fromIso(cfg.start); if (d !== null) S.start = d - wdOf(d); }
+  if (cfg.visning === "udlaan" || cfg.visning === "besoeg") S.measure = cfg.visning;
+  const extra = Array.isArray(window.PROGNOSE_SAERLIGE_DAGE) ? window.PROGNOSE_SAERLIGE_DAGE.filter(s => s && fromIso(s.dato) !== null) : [];
+  S.special = BUILTIN_SPECIAL.filter(b => !extra.some(e => iso(fromIso(e.dato)) === b.dato)).concat(extra.map(e => ({ dato: iso(fromIso(e.dato)), navn: String(e.navn || "Særlig dag"), type: ["valg", "arrangement", "lukket"].includes(e.type) ? e.type : "arrangement" })));
+  loadWeather();
+  if (typeof DecompressionStream === "undefined") { warn("Din browser er for gammel til at læse Excel-filer. Brug en opdateret Edge, Chrome eller Firefox.", true); return; }
+  const ex = Array.isArray(window.PROGNOSE_EKSPORTER) ? window.PROGNOSE_EKSPORTER : [];
+  if (ex.length) loadSources(ex.map(e => ({ name: String(e.navn || "eksport.xlsx"), bytes: () => { const u = b64ToBytes(e.base64); e.base64 = null; return u; } })));
+  else $("drop").classList.add("show");
+})();
+</script>
+</body>
+</html>

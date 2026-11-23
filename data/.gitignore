@@ -1,0 +1,4 @@
+# Alt i data/ bliver på computeren, undtagen denne fil og README.md
+*
+!.gitignore
+!README.md
