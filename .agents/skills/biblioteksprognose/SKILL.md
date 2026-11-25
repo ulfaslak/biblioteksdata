@@ -10,10 +10,10 @@ Du åbner et færdigt værktøj, `prognose.html` i samme mappe som denne fil, me
 ## Sådan gør du
 
 1. **Find dataene.** Som standard ligger de i mappen `data` i roden af repoet (mappen med `README.md` og `AGENTS.md`). Er den tom, så spørg brugeren, hvor filerne ligger (ofte i Overførsler/Downloads), og kopier dem til `data`. Brug alle filer med besøgstal fra persontællerne og udlånsdata fra Cicero (`.xlsx` eller `.csv`), gerne flere år. Værktøjet finder selv ud af, hvilke filer der er besøg, og hvilke der er udlån. Læg kun relevante filer i mappen, eller peg på en mappe, der kun har dem.
-2. **Skriv `data.js`** i denne mappe med kommandoerne nedenfor. Skriv kommandoerne direkte i terminalen. Lav ikke en scriptfil: mange kommuner blokerer `.ps1`-filer.
+2. **Skriv `data.js**` i denne mappe med kommandoerne nedenfor. Skriv kommandoerne direkte i terminalen. Lav ikke en scriptfil: mange kommuner blokerer `.ps1`-filer.
 3. **Hent vejret** for bibliotekets by med kommandoerne under *Vejr*. Det er valgfrit: virker internettet ikke, så spring det over. Prognosen virker også uden.
 4. **Tilføj det, brugeren har fortalt** om ugen, filialen eller særlige dage (se *Indstillinger*).
-5. **Åbn `prognose.html`** (sidste kommando nedenfor). Store udlånsfiler tager op til et halvt minut at læse.
+5. **Åbn `prognose.html**` (sidste kommando nedenfor). Store udlånsfiler tager op til et halvt minut at læse.
 6. **Svar kort**: prognosen er åbnet i browseren, med faner for besøgende og udlån. Brugeren kan folde "Kort tekst til kolleger eller chef" ud nederst på siden og kopiere teksten tilbage i chatten, hvis I skal arbejde videre med tallene.
 
 Kommandoerne går ud fra, at terminalen står i roden af repoet. Skal du bruge filer fra en anden mappe, så erstat `data` med den mappe.
@@ -80,3 +80,5 @@ window.PROGNOSE_SAERLIGE_DAGE = [ { dato: "2026-11-26", navn: "Forfatteraften", 
 
 - Sende dataene nogen steder hen. Alt foregår på brugerens egen computer. Det eneste, der går ud, er bynavnet til vejrtjenesten.
 - Love præcise tal. Prognosen har et spænd, og siden viser, hvor godt den har ramt de seneste uger.
+
+ 
