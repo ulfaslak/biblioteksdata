@@ -11,10 +11,10 @@ Lavet af Ulf Aslak til Bibliotekernes Datakonference i Vejle, 24. november 2026.
 
    | Agent | Kræver | App | Hent den her |
    |---|---|---|---|
+   | Mistral Vibe | Mistral-konto | Vibe-appen (Mac og Windows) | [mistral.ai/products/vibe](https://mistral.ai/products/vibe/code/) |
    | Claude Code | Claude-abonnement | Claude-appen (Mac og Windows), fanen **Code** | [claude.com/download](https://claude.com/download) |
    | Codex | ChatGPT-abonnement | Codex-appen (Mac og Windows) | [developers.openai.com/codex/app](https://developers.openai.com/codex/app) |
    | GitHub Copilot | Copilot-abonnement | Visual Studio Code med Copilot | [code.visualstudio.com](https://code.visualstudio.com) |
-   | Mistral Vibe | Mistral-konto | Vibe-appen (Mac og Windows) | [mistral.ai/products/vibe](https://mistral.ai/products/vibe/code/) |
 
    På Windows skal Claude Code også have [Git for Windows](https://git-scm.com/downloads/win) installeret første gang. På en låst kommunal computer kan det kræve hjælp fra IT.
 3. **Åbn mappen i agenten.** Vælg den udpakkede mappe som projekt, fx med **Open folder** (i Visual Studio Code: **Filer → Åbn mappe**, og åbn derefter Copilot-chatten i agent-tilstand). Spørger den, om du stoler på mappen, så svar ja. Ellers læser den ikke instruktionerne og opskrifterne her.
@@ -26,10 +26,10 @@ Alle fire findes også som et program, du starter i en terminal. Følg vejlednin
 
 | Agent | Vejledning | Start med |
 |---|---|---|
+| Mistral Vibe | [github.com/mistralai/mistral-vibe](https://github.com/mistralai/mistral-vibe) | `vibe` |
 | Claude Code | [github.com/anthropics/claude-code](https://github.com/anthropics/claude-code) | `claude` |
 | Codex | [github.com/openai/codex](https://github.com/openai/codex) | `codex` |
 | GitHub Copilot CLI | [github.com/github/copilot-cli](https://github.com/github/copilot-cli) | `copilot` |
-| Mistral Vibe | [github.com/mistralai/mistral-vibe](https://github.com/mistralai/mistral-vibe) | `vibe` |
 
 Åbn en terminal i mappen, og skriv kommandoen:
 
@@ -57,7 +57,7 @@ Har du en analyse, du vil lave igen, så bed agenten: "Gem det her som en skill.
 ## Databeskyttelse
 
 - **Ingen personoplysninger i `data`**: ingen navne, lånernumre, CPR-numre eller adresser. Udlånseksporten fra Cicero med filial, materiale og lånergruppe og besøgstal fra tællerne er ikke personoplysninger, men tjek selv, hvad jeres eksport indeholder.
-- **Det, agenten læser, sendes til AI-tjenesten** (Anthropic, OpenAI, GitHub eller Mistral). Agenten er bedt om kun at læse det, den har brug for, og om aldrig at sende data andre steder hen.
+- **Det, agenten læser, sendes til AI-tjenesten** (Mistral, Anthropic, OpenAI eller GitHub). Agenten er bedt om kun at læse det, den har brug for, og om aldrig at sende data andre steder hen.
 - **KL's vejledning om generativ AI** (december 2025): personoplysninger må kun bruges i AI-værktøjer, kommunen har godkendt til det. Spørg jeres IT eller databeskyttelsesrådgiver, hvilke værktøjer I må bruge, og til hvad.
 
 ## Slides fra Bibliotekernes Datakonference 2026
